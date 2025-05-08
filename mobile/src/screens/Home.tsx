@@ -1,10 +1,11 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { Center } from "@/components/ui/center";
+import { Text } from "@/components/ui/text";
 
 export default function Home() {
   return (
-    <View>
+    <Center className="flex-1">
       <Text>Aqui tem corage</Text>
-    </View>
+    </Center>
   );
 }

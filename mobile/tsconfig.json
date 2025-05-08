@@ -2,16 +2,13 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
+      "@/components/ui/*": ["./components/ui/*"],
       "@components/*": ["./src/components/*"],
       "@screens/*": ["./src/screens/*"],
-      "tailwind.config": [
-        "./tailwind.config.js"
-      ]
+      "tailwind.config": ["./tailwind.config.js"]
     },
-    "jsx": "react-native",
+    "jsx": "react-native"
   },
-  "exclude": [
-    "node_modules"
-  ],
+  "exclude": ["node_modules"],
   "extends": "expo/tsconfig.base"
 }
