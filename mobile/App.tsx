@@ -1,19 +1,17 @@
-import { StyleSheet, Text, View, StatusBar } from 'react-native';
+import { StatusBar } from "react-native"
+import { GluestackUIProvider } from "@gluestack-ui/themed";
+import { config } from "./components/ui/gluestack-ui-provider/config";
+import Home from "./src/screens/Home";
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>APP</Text>
-    </View>
+    <GluestackUIProvider config={config}>
+      <StatusBar 
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+      <Home />
+    </GluestackUIProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
-//https://github.com/gluestack/gluestack-ui/issues/2495
