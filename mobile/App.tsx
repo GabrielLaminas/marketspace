@@ -1,11 +1,14 @@
+import "./global.css";
+
 import { StatusBar } from "react-native";
-import { GluestackUIProvider } from "@gluestack-ui/themed";
-import { config } from "./components/ui/gluestack-ui-provider/config";
+
+import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+
 import Home from "./src/screens/Home";
 
 export default function App() {
   return (
-    <GluestackUIProvider config={config} colorMode="light">
+    <GluestackUIProvider>
       <StatusBar
         barStyle="light-content"
         backgroundColor="transparent"
