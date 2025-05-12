@@ -1,6 +1,8 @@
 {
   "compilerOptions": {
     "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
     "paths": {
       "@assets/*": ["./src/assets/*"],
       "@/components/ui/*": ["./components/ui/*"],

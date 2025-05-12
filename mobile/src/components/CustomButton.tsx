@@ -1,30 +1,33 @@
-import React from "react";
-import {
-  Button as BTN,
-  ButtonText,
-  ButtonSpinner,
-} from "@/components/ui/button";
+import React, { ComponentProps } from "react";
+import { TouchableOpacityProps } from "react-native";
+import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
 
-type Props = {
+type Props = TouchableOpacityProps & {
   text: string;
   variant: "PRIMARY" | "SECUNDARY" | "NEUTRAL";
   isLoading?: boolean;
 };
 
-export default function Button({ text, variant, isLoading = false }: Props) {
+export default function CustomButton({
+  text,
+  variant,
+  isLoading = false,
+  ...rest
+}: Props) {
   return (
-    <BTN
+    <Button
       className={`
         h-12 rounded-md
-      ${
-        variant === "PRIMARY"
-          ? "bg-product-secundary"
-          : variant === "SECUNDARY"
-          ? "bg-base-100"
-          : "bg-base-500"
-      }
-    `}
+        ${
+          variant === "PRIMARY"
+            ? "bg-product-secundary"
+            : variant === "SECUNDARY"
+            ? "bg-base-100"
+            : "bg-base-500"
+        }
+      `}
+      {...rest}
     >
       {isLoading ? (
         <ButtonSpinner
@@ -48,6 +51,6 @@ export default function Button({ text, variant, isLoading = false }: Props) {
           </ButtonText>
         </HStack>
       )}
-    </BTN>
+    </Button>
   );
 }

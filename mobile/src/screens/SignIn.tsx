@@ -10,7 +10,7 @@ import { Image } from "@/components/ui/image";
 import Logo from "@assets/logo.svg";
 import { Box } from "@/components/ui/box";
 import CustomInput from "@components/CustomInput";
-import Button from "@components/Button";
+import CustomButton from "@components/CustomButton";
 
 export default function SignIn() {
   return (
@@ -31,19 +31,13 @@ export default function SignIn() {
 
           <Box>
             <VStack className="gap-4">
-              <CustomInput placeholder="E-mail" />
+              <CustomInput placeholder="E-mail" type="text" />
 
               <CustomInput placeholder="Senha" type="password" />
 
-              {/* <Input className="min-h-11 h-11">
-                <InputField placeholder="E-mail" keyboardType="email-address" />
-              </Input>
-
-              <Input className="min-h-11 h-11">
-                <InputField placeholder="Senha" />
-              </Input> */}
-
-              <Button text="Entrar" variant="PRIMARY" />
+              <Box className="mt-4">
+                <CustomButton text="Entrar" variant="PRIMARY" />
+              </Box>
             </VStack>
           </Box>
         </VStack>
@@ -54,7 +48,7 @@ export default function SignIn() {
           Ainda não tem acesso?
         </Text>
 
-        <Button text="Criar uma conta" variant="NEUTRAL" />
+        <CustomButton text="Criar uma conta" variant="NEUTRAL" />
       </Box>
     </ScrollView>
   );
