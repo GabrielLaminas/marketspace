@@ -2,15 +2,14 @@ import React from "react";
 import { ScrollView } from "react-native";
 
 import { VStack } from "@/components/ui/vstack";
-import { HStack } from "@/components/ui/hstack";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
-import { Image } from "@/components/ui/image";
-
-import Logo from "@assets/logo.svg";
 import { Box } from "@/components/ui/box";
+
 import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
+
+import Logo from "@assets/logo.svg";
 
 export default function SignIn() {
   return (
