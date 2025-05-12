@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
     "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
     "paths": {
+      "@assets/*": ["./src/assets/*"],
       "@/components/ui/*": ["./components/ui/*"],
       "@components/*": ["./src/components/*"],
+      "@routes/*": ["./src/routes/*"],
       "@screens/*": ["./src/screens/*"],
       "tailwind.config": ["./tailwind.config.js"]
     },
