@@ -6,13 +6,16 @@ import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { Box } from "@/components/ui/box";
 import { Image } from "@/components/ui/image";
+import { Center } from "@/components/ui/center";
 
 import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
 
+import { PencilSimpleLine } from "phosphor-react-native";
+
 import Logo from "@assets/logo.svg";
 import Avatar from "@assets/avatar.png";
-import { Center } from "@/components/ui/center";
+
 
 export default function SignUp() {
   return (
@@ -20,7 +23,7 @@ export default function SignUp() {
       contentContainerStyle={{ flexGrow: 1 }}
       showsVerticalScrollIndicator={false}
     >
-      <Box style={{ flex: 1 }} className="px-12 pt-16 pb-14 bg-base-600">
+      <Box className="flex-1 px-12 pt-16 pb-14 bg-base-600">
         <VStack className="mb-8 items-center">
           <Logo width={60} height={40} />
 
@@ -34,15 +37,19 @@ export default function SignUp() {
         </VStack>
 
         <VStack>
-          <Center className="mb-4">
+          <Center className="mb-5">
             <Box className="relative">
               <Image
                 source={Avatar}
                 alt="avatar profile"
-                width={88}
-                height={88}
-                className="size-20 bg-base-500 border-[3px] border-product-secundary rounded-full"
+                resizeMode="cover"
+                width={89}
+                height={89}
+                className="size-24 bg-base-500 border-[3px] border-product-secundary rounded-full"
               />
+              <Box className="absolute -right-2 -bottom-1 bg-product-secundary size-10 justify-center items-center rounded-full">
+                <PencilSimpleLine size={16} color="#FFFFFF" />
+              </Box>
             </Box>
           </Center>
 
