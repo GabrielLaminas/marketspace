@@ -25,7 +25,7 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <SignUp /> : <Loading />}
+      {fontsLoaded ? <Home /> : <Loading />}
     </GluestackUIProvider>
   );
 }
