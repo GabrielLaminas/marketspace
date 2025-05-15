@@ -14,17 +14,36 @@ const DATA = [
   {
     id: 1,
     kind: "novo",
-    name: "Bicicleta",
-    preco: 559.50
+    name: "Sandalia alta",
+    preco: 69.50,
+    uri: "https://kallan.vteximg.com.br/arquivos/ids/450035-1140-1140/45030322_001_1-FEM-SAND-SALTO-TR-PRNT-6262-1009.jpg?v=638279730355670000",
+    user: "https://cdn.vectorstock.com/i/1000v/66/13/default-avatar-profile-icon-social-media-user-vector-49816613.jpg" 
   },
   {
     id: 2,
     kind: "usada",
-    name: "Bicicleta Eletrica",
-    preco: 1559.50
+    name: "Sandalia rasteirinha",
+    preco: 79.50,
+    uri: "https://cdn.awsli.com.br/2500x2500/1313/1313400/produto/232523900/img_9175-9ib5kg3xtk.jpeg",
+    user: "https://cdn-icons-png.flaticon.com/512/9187/9187532.png" 
+  },
+  {
+    id: 3,
+    kind: "novo",
+    name: "Bicicleta",
+    preco: 559.50,
+    uri: "https://static.netshoes.com.br/produtos/bicicleta-aro-29-krw-aluminio-shimano-tz-24-vel-suspensao-freio-a-disco-mountain-bike-ltx-s40/60/CGY-0283-260/CGY-0283-260_zoom1.jpg?ts=1725874935&ims=326x",
+    user: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/2048px-User_icon_2.svg.png" 
+  },
+  {
+    id: 4,
+    kind: "novo",
+    name: "PS5",
+    preco: 4000.00,
+    uri: "https://http2.mlstatic.com/D_609064-MLB83284097521_032025-O.jpg",
+    user: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/System-users.svg/2048px-System-users.svg.png" 
   }
 ]
-
 
 export default function Home() {
   return (
@@ -34,7 +53,16 @@ export default function Home() {
       <Sell />
 
       <ProductFilter />
-
+      
+      <FlatList 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 64 }}
+        numColumns={2}
+        columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 24 }}
+        data={DATA}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={({ item, index }) => <CardItem data={item} index={index} />}
+      />
     </Box>
   );
 }

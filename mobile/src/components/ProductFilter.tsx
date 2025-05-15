@@ -10,7 +10,7 @@ import { MagnifyingGlass, Sliders } from "phosphor-react-native";
 
 export default function ProductFilter() {
   return (
-    <Box>
+    <Box className="mb-[24px]">
       <Text className="mb-3.5 text-base text-base-300">
         Compre produtos variados
       </Text>
