@@ -16,7 +16,6 @@ import { PencilSimpleLine } from "phosphor-react-native";
 import Logo from "@assets/logo.svg";
 import Avatar from "@assets/avatar.png";
 
-
 export default function SignUp() {
   return (
     <ScrollView
@@ -45,9 +44,10 @@ export default function SignUp() {
                 resizeMode="cover"
                 width={89}
                 height={89}
-                className="size-24 bg-base-500 border-[3px] border-product-secundary rounded-full"
+                size="none"
+                className="bg-base-500 border-[3px] border-product-secundary rounded-full"
               />
-              <Box className="absolute -right-2 -bottom-1 bg-product-secundary size-10 justify-center items-center rounded-full">
+              <Box className="absolute -right-2 bottom-0 bg-product-secundary size-10 justify-center items-center rounded-full">
                 <PencilSimpleLine size={16} color="#FFFFFF" />
               </Box>
             </Box>

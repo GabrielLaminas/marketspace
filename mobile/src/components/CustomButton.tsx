@@ -1,7 +1,11 @@
-import React, { ComponentProps } from "react";
+import React, { JSX, ComponentProps } from "react";
 import { TouchableOpacityProps } from "react-native";
 import { Button, ButtonText, ButtonSpinner } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
+import { type IconProps } from "phosphor-react-native";
+import { Icon } from "@/components/ui/icon";
+
+type IconType = (props: IconProps) => JSX.Element;
 
 type Props = TouchableOpacityProps & {
   text: string;
