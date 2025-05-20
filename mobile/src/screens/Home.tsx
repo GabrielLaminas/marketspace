@@ -1,5 +1,5 @@
-import React from "react";
-import { FlatList } from "react-native";
+import { useRef, useCallback, useMemo, useEffect, useState } from "react";
+import { FlatList, StyleSheet } from "react-native";
 import { Center } from "@/components/ui/center";
 import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
@@ -9,6 +9,9 @@ import HomeHeader from "@components/HomeHeader";
 import Sell from "@components/Sell";
 import ProductFilter from "@components/ProductFilter";
 import CardItem from "@components/CardItem";
+import Filter, { CustomBottomSheetModalRef } from "@components/Filter";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const DATA = [
   {
@@ -46,23 +49,54 @@ const DATA = [
 ]
 
 export default function Home() {
+  const modalRef = useRef<CustomBottomSheetModalRef>(null);
+
+  function handleFilterShowModal(){
+    modalRef.current?.present();
+  }
+
+  function handleFilterHiddenModal(){
+    modalRef.current?.dismiss();   
+  }
+
   return (
-    <Box className="flex-1 px-6 pt-16">
-      <HomeHeader />
+    <>
+      <Box className="flex-1 px-6 pt-16 relative">
+        <HomeHeader />
 
-      <Sell />
+        <Sell />
 
-      <ProductFilter />
-      
-      <FlatList 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 64 }}
-        numColumns={2}
-        columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 24 }}
-        data={DATA}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item, index }) => <CardItem data={item} index={index} />}
-      />
-    </Box>
+        <ProductFilter 
+          onPress={handleFilterShowModal}
+        />
+        
+        <FlatList 
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 64 }}
+          numColumns={2}
+          columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 24 }}
+          data={DATA}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item, index }) => <CardItem data={item} index={index} />}
+        />
+      </Box>
+
+      <Filter 
+        ref={modalRef} 
+        hiddenModal={handleFilterHiddenModal} 
+      /> 
+    </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    width: "100%",
+    height: "100%",
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+  },
+});
