@@ -12,6 +12,7 @@ import Home from "./src/screens/Home";
 import Loading from "@components/Loading";
 import SignUp from "@screens/SignUp";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import Details from "@screens/Details";
 
 export default function App() {
   const fontsLoaded = useFonts({
@@ -27,7 +28,7 @@ export default function App() {
           backgroundColor="transparent"
           translucent
         />
-        {fontsLoaded ? <Home /> : <Loading />}
+        {fontsLoaded ? <Details /> : <Loading />}
       </GestureHandlerRootView>
     </GluestackUIProvider>
   );
