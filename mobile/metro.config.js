@@ -1,5 +1,6 @@
 const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
+const { wrapWithReanimatedMetroConfig } = require("react-native-reanimated/metro-config");
 
 const config = getDefaultConfig(__dirname);
 
@@ -14,4 +15,5 @@ const sourceExts = [...config.resolver.sourceExts, "svg"];
 config.resolver.assetExts = assetExts;
 config.resolver.sourceExts = sourceExts;
 
-module.exports = withNativeWind(config, { input: "./global.css" });
+const withNativeWindConfig = withNativeWind(config, { input: "./global.css" });
+module.exports = wrapWithReanimatedMetroConfig(withNativeWindConfig);
