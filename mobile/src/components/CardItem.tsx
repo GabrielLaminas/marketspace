@@ -36,7 +36,7 @@ export default function CardItem({ data, index }: { data: Props, index: number }
             width={24}
             height={24}
             alt={data.name}
-            className="rounded-full border-1 border-base-700 bg-slate-400"
+            className="rounded-full border-2 border-base-700 bg-slate-400"
           />
 
           <Badge className="px-[8px] py-[2px] rounded-full bg-product-primary">
