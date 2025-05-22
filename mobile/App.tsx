@@ -7,12 +7,13 @@ import {
 
 import "./global.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import Home from "./src/screens/Home";
 import Loading from "@components/Loading";
 import SignUp from "@screens/SignUp";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Details from "@screens/Details";
+import Announcement from "@screens/Announcement";
 
 export default function App() {
   const fontsLoaded = useFonts({
@@ -28,7 +29,7 @@ export default function App() {
           backgroundColor="transparent"
           translucent
         />
-        {fontsLoaded ? <Details /> : <Loading />}
+        {fontsLoaded ? <Announcement /> : <Loading />}
       </GestureHandlerRootView>
     </GluestackUIProvider>
   );

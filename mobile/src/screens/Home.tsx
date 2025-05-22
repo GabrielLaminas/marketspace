@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { FlatList, StyleSheet } from "react-native";
+import { FlatList } from "react-native";
 import { Box } from "@/components/ui/box";
 
 import HomeHeader from "@components/HomeHeader";
