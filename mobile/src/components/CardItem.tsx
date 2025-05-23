@@ -21,7 +21,7 @@ interface Props {
 export default function CardItem({ data, index }: { data: Props, index: number }) {
   return (
     <VStack className={`flex-1 ${index % 2 === 0 && "mr-[20px]"}`}>
-      <Box className="relative">
+      <Box className="relative overflow-hidden rounded-md">
         <Image 
           source={{ uri: data.uri }}
           size="none"
@@ -30,7 +30,13 @@ export default function CardItem({ data, index }: { data: Props, index: number }
           className="w-full h-[100px] rounded-md bg-slate-700"
         />
 
-      <HStack className={`absolute left-0 top-0 w-full p-1 ${data.user ? "justify-between" : "justify-end"}`}>
+        { data.status === "inactive" && (
+          <Box className="size-full absolute left-0 top-0 z-10 p-2 bg-base-100/45 flex justify-end">
+            <Heading className="uppercase text-sm text-base-700">Anúncio desativado</Heading>
+          </Box>
+        )}     
+        
+        <HStack className={`w-full absolute left-0 top-0 p-1 ${data.user ? "justify-between" : "justify-end"}`}>
           {
             data.user && (
               <Image 
@@ -44,11 +50,11 @@ export default function CardItem({ data, index }: { data: Props, index: number }
             )
           }
           <Badge className="px-[8px] py-[2px] rounded-full bg-product-primary">
-            <BadgeText className="uppercase font-heading text-center text-base-700">{data.kind}</BadgeText>
+            <BadgeText className="uppercase font-heading font-bold text-center text-base-700">{data.kind}</BadgeText>
           </Badge>
         </HStack>
       </Box>
-      {}
+
       <Box className="mt-1">
         <Text className={`text-base ${ data.status && data.status === "active" ? "text-base-200" : "text-base-400"}`}>
           {data.name}

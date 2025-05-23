@@ -53,7 +53,7 @@ const DATA: Array<DataProps> = [
   {
     id: 4,
     kind: "novo",
-    name: "Casa de Sítio Simples com Varanda",
+    name: "Casa de Sítio com Varanda",
     preco: 40000.00,
     uri: "https://vgprojetos.com/wp-content/uploads/2024/12/P11-3.png",
     status: "inactive",
