@@ -15,6 +15,7 @@ import SignUp from "@screens/SignUp";
 import Details from "@screens/Details";
 import Announcement from "@screens/Announcement";
 import DetailsAnnouncement from "@screens/DetailsAnnouncement";
+import CreateAnnouncement from "@screens/CreateAnnouncement";
 
 export default function App() {
   const fontsLoaded = useFonts({
@@ -30,7 +31,7 @@ export default function App() {
           backgroundColor="transparent"
           translucent
         />
-        {fontsLoaded ? <Details /> : <Loading />}
+        {fontsLoaded ? <CreateAnnouncement /> : <Loading />}
       </GestureHandlerRootView>
     </GluestackUIProvider>
   );
