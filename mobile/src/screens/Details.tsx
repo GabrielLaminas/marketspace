@@ -12,9 +12,9 @@ import { Image } from "@/components/ui/image";
 import CustomButton from "@components/CustomButton";
 import Carousel from "@components/Carousel";
 
-import { 
-  ArrowLeft, Barcode, Bank, Money, QrCode, CreditCard 
-} from "phosphor-react-native";
+import { Barcode, Bank, Money, QrCode, CreditCard } from "phosphor-react-native";
+import { ArrowLeft } from "lucide-react-native";
+import Header from "@components/Header";
 
 const DATA = [
   "https://cdn.awsli.com.br/600x700/1259/1259538/produto/238747959/img_6666-8zgzqibzh0.jpg",
@@ -26,9 +26,11 @@ export default function Details() {
   return (
     <Box className="flex-1">
       <ScrollView showsVerticalScrollIndicator={false}>
-        <TouchableOpacity className="mt-[64px] px-[24px] mb-[12px]">
-          <ArrowLeft size={24} color="#1A181B" />
-        </TouchableOpacity>
+        <Box className="mt-[64px] px-[24px] mb-[12px]">
+          <Header 
+            iconLeft={ArrowLeft}
+          />
+        </Box>
 
         <Carousel 
           data={DATA}

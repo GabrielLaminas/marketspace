@@ -30,7 +30,7 @@ export default function App() {
           backgroundColor="transparent"
           translucent
         />
-        {fontsLoaded ? <DetailsAnnouncement /> : <Loading />}
+        {fontsLoaded ? <Details /> : <Loading />}
       </GestureHandlerRootView>
     </GluestackUIProvider>
   );
