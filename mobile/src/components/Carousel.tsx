@@ -10,16 +10,16 @@ const screenWidth = Dimensions.get("window").width;
 
 type Props = {
   data: string[];
-  activeAd?: boolean;
+  inactiveAd?: boolean;
 }
 
-export default function Carousel({ data, activeAd = false }: Props) {
+export default function Carousel({ data, inactiveAd = false }: Props) {
   const progress = useSharedValue<number>(0);
 
   return (
     <View id="carousel-component" style={{ position: 'relative' }}>
       <RNCarousel 
-        autoPlay={activeAd ? false : true}
+        autoPlay={inactiveAd ? false : true}
         autoPlayInterval={5000}
         data={data}
         height={280}
@@ -48,7 +48,7 @@ export default function Carousel({ data, activeAd = false }: Props) {
         )}
       />
 
-      {activeAd && (
+      {inactiveAd && (
         <Box className="absolute left-0 top-0 size-full p-1 justify-center items-center bg-base-100/60">
           <Heading className="uppercase text-base text-base-700 text-center">
             Anúncio desativado

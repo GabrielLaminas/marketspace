@@ -31,7 +31,6 @@ export default function Header({ text, iconLeft, iconLeftAction, iconRight, icon
           <Icon className="w-7 h-7" color="#1A181B" as={iconRight} /> 
         </TouchableOpacity>
       ) : <Box className="w-7 h-7" />  }
-      
     </HStack>
   );
 }
