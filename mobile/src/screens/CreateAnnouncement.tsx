@@ -50,7 +50,7 @@ export default function CreateAnnouncement() {
               <Textarea>
                 <TextareaInput 
                   placeholder="Descrição do produto" 
-                  className="bg-base-700 text-base-400 text-base" 
+                  className="px-4 bg-base-700 text-base-400 text-base" 
                   style={{ textAlignVertical: 'top' }} 
                 />
               </Textarea>
