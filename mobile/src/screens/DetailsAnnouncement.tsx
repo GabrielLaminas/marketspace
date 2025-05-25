@@ -11,11 +11,10 @@ import { Image } from "@/components/ui/image";
 
 import CustomButton from "@components/CustomButton";
 import Carousel from "@components/Carousel";
+import Header from "@components/Header";
 
 import { Barcode, Bank, Money, QrCode, CreditCard } from "phosphor-react-native";
-import { ArrowLeft, PencilLine } from "lucide-react-native";
-
-import Header from "@components/Header";
+import { ArrowLeft, PencilLine, Power, Trash } from "lucide-react-native";
 
 const DATA = [
   "https://cdn.awsli.com.br/600x700/1259/1259538/produto/238747959/img_6666-8zgzqibzh0.jpg",
@@ -118,11 +117,13 @@ export default function DetailsAnnouncement() {
               <CustomButton 
                 text="Reativar anúncio"
                 variant="PRIMARY"
+                icon={Power}
               />
             ) : (
               <CustomButton 
                 text="Desativar anúncio"
                 variant="SECUNDARY"
+                icon={Power}
               />
             )
           }
@@ -130,6 +131,7 @@ export default function DetailsAnnouncement() {
           <CustomButton 
             text="Excluir anúncio"
             variant="NEUTRAL"
+            icon={Trash}
           />
         </VStack>
       </Box>

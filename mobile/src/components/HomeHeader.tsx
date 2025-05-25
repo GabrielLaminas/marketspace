@@ -2,12 +2,12 @@ import React from "react";
 
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
-import { Box } from "@/components/ui/box";
 import { Image } from "@/components/ui/image";
 
-
-import Avatar from "@assets/avatar.png";
 import CustomButton from "./CustomButton";
+
+import { Plus } from "lucide-react-native";
+import Avatar from "@assets/avatar.png";
 
 export default function HomeHeader() {
   return (
@@ -30,6 +30,7 @@ export default function HomeHeader() {
       <CustomButton 
         text="Criar anúncio"
         variant="SECUNDARY"
+        icon={Plus}
       />
     </HStack>
   );
