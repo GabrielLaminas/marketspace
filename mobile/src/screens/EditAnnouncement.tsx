@@ -18,7 +18,7 @@ import CustomInput from "@components/CustomInput";
 
 import { ArrowLeft, Plus } from "lucide-react-native";
 
-export default function CreateAnnouncement() {
+export default function EditAnnouncement() {
   const [values, setValues] = useState("")
 
   return (
@@ -28,7 +28,7 @@ export default function CreateAnnouncement() {
           <Box>
             <Header
               iconLeft={ArrowLeft} 
-              text="Criar anúncio"
+              text="Editar anúncio"
             />
           </Box>
 
