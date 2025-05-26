@@ -9,16 +9,10 @@ import "./global.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import Home from "./src/screens/Home";
+import { NavigationContainer } from "@react-navigation/native"
+
 import Loading from "@components/Loading";
-import SignUp from "@screens/SignUp";
-import Details from "@screens/Details";
-import Announcement from "@screens/Announcement";
-import DetailsAnnouncement from "@screens/DetailsAnnouncement";
-import CreateAnnouncement from "@screens/CreateAnnouncement";
-import EditAnnouncement from "@screens/EditAnnouncement";
-import PreviewAnnouncement from "@screens/PreviewAnnouncement";
-import SignIn from "@screens/SignIn";
+import Routes from "@routes/index";
 
 export default function App() {
   const fontsLoaded = useFonts({
@@ -28,14 +22,20 @@ export default function App() {
 
   return (
     <GluestackUIProvider>
-      <GestureHandlerRootView>
-        <StatusBar
-          barStyle="dark-content"
-          backgroundColor="transparent"
-          translucent
-        />
-        {fontsLoaded ? <SignIn /> : <Loading />}
-      </GestureHandlerRootView>
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor="transparent"
+        translucent
+      />
+      {
+        fontsLoaded 
+        ? (
+          <GestureHandlerRootView>
+            <Routes />
+          </GestureHandlerRootView>
+        ) 
+        : <Loading />
+      }         
     </GluestackUIProvider>
   );
 }
