@@ -9,8 +9,6 @@ import "./global.css";
 import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { NavigationContainer } from "@react-navigation/native"
-
 import Loading from "@components/Loading";
 import Routes from "@routes/index";
 

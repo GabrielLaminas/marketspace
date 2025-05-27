@@ -9,20 +9,25 @@ import { Heading } from "@/components/ui/heading";
 
 import { Tag, ArrowRight } from "phosphor-react-native";
 
-export default function Sell() {
+type Props = {
+  quantity: number;
+  onPress: () => void;
+}
+
+export default function Sell({ quantity, onPress }: Props) {
   return (
     <Box className="mb-9">
       <Text className="mb-3.5 text-base text-base-300">
         Seus produtos anunciados para venda
       </Text>
 
-      <TouchableOpacity>
+      <TouchableOpacity onPress={onPress}>
         <HStack space="md" className="py-3.5 pl-4 pr-5 justify-between items-center bg-product-secundary/10 rounded-md">
           <HStack space="lg" className="items-center">
             <Tag size={22} color="#364D9D" weight="bold" />
 
             <VStack>
-              <Heading className="text-base-200 text-xl">4</Heading>
+              <Heading className="text-base-200 text-xl">{quantity}</Heading>
               <Text className="text-base-200 text-sm">anúncios ativos</Text>
             </VStack>
           </HStack>

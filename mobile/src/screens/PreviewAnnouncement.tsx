@@ -1,6 +1,9 @@
 import { ScrollView, SafeAreaView } from "react-native";
 import React from "react";
 
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { AppRoutesProps } from "@routes/app.routes";
+
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
@@ -15,16 +18,24 @@ import Carousel from "@components/Carousel";
 import { Barcode, Bank, Money, QrCode, CreditCard } from "phosphor-react-native";
 import { ArrowLeft, Tag } from "lucide-react-native";
 
-import Header from "@components/Header";
-
 const DATA = [
   "https://cdn.awsli.com.br/600x700/1259/1259538/produto/238747959/img_6666-8zgzqibzh0.jpg",
   "https://down-br.img.susercontent.com/file/sg-11134201-7rd57-lwyqk6femsfa96",
   "https://lebiscuit.vtexassets.com/arquivos/ids/21689609/17302131428199.jpg?v=638679144080530000"
 ]
 
-export default function PreviewAnnouncement() {
+type Props = BottomTabScreenProps<AppRoutesProps, "PreviewAnnouncement">;
+
+export default function PreviewAnnouncement({ navigation }: Props) {
   const inactive = false;
+
+  function handleNavigationGoBack(){
+    navigation.goBack();
+  }
+
+  function handleNavigationDetailsAnnouncement(){
+    navigation.navigate("DetailsAnnouncement");
+  }
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -116,6 +127,7 @@ export default function PreviewAnnouncement() {
             variant="NEUTRAL"
             icon={ArrowLeft}
             style={{ flex: 1 }}
+            onPress={handleNavigationGoBack}
           />
 
           <CustomButton 
@@ -123,6 +135,7 @@ export default function PreviewAnnouncement() {
             variant="PRIMARY"
             icon={Tag}
             style={{ flex: 1 }}
+            onPress={handleNavigationDetailsAnnouncement}
           />
         </HStack>
       </Box>

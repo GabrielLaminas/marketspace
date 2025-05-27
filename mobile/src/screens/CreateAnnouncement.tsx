@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { AppRoutesProps } from "@routes/app.routes";
+
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
@@ -18,8 +21,18 @@ import CustomInput from "@components/CustomInput";
 
 import { ArrowLeft, Plus } from "lucide-react-native";
 
-export default function CreateAnnouncement() {
-  const [values, setValues] = useState("")
+type Props = BottomTabScreenProps<AppRoutesProps, "CreateAnnouncement">;
+
+export default function CreateAnnouncement({ navigation }: Props) {
+  const [values, setValues] = useState("");
+
+  function handleNavigationToGoBack(){
+    navigation.goBack();
+  }
+
+  function handleNavigationToPreview(){
+    navigation.navigate("PreviewAnnouncement");
+  }
 
   return (
     <VStack className="flex-1">
@@ -28,6 +41,7 @@ export default function CreateAnnouncement() {
           <Box>
             <Header
               iconLeft={ArrowLeft} 
+              iconLeftAction={handleNavigationToGoBack}
               text="Criar anúncio"
             />
           </Box>
@@ -114,11 +128,13 @@ export default function CreateAnnouncement() {
             text="Cancelar"
             variant="NEUTRAL"
             style={{ flex: 1 }}
+            onPress={handleNavigationToGoBack}
           />
           <CustomButton 
             text="Avançar"
             variant="SECUNDARY"
             style={{ flex: 1 }}
+            onPress={handleNavigationToPreview}
           />
         </HStack>
       </Box>

@@ -12,12 +12,24 @@ import PreviewAnnouncement from "@screens/PreviewAnnouncement";
 
 import { HomeIcon, Tag, LogOut } from "lucide-react-native";
 
-const { Navigator, Screen } = createBottomTabNavigator();
+export type AppRoutesProps = {
+  Home: undefined;
+  Announcement: undefined;
+  Logout: undefined;
+  Details: undefined;
+  DetailsAnnouncement: undefined;
+  CreateAnnouncement: undefined;
+  EditAnnouncement: undefined;
+  PreviewAnnouncement: undefined;
+}
+
+const { Navigator, Screen } = createBottomTabNavigator<AppRoutesProps>();
 
 export default function AppRoutes() { 
   return (
     <Navigator
       screenOptions={{
+        animation: "shift",
         headerShown: false,
         tabBarShowLabel: false,
         tabBarIconStyle: { flex: 1 },

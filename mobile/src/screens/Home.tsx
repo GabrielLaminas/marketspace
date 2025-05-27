@@ -1,5 +1,9 @@
 import { useRef } from "react";
 import { FlatList } from "react-native";
+
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { AppRoutesProps } from "@routes/app.routes";
+
 import { Box } from "@/components/ui/box";
 
 import HomeHeader from "@components/HomeHeader";
@@ -8,7 +12,17 @@ import ProductFilter from "@components/ProductFilter";
 import CardItem from "@components/CardItem";
 import Filter, { CustomBottomSheetModalRef } from "@components/Filter";
 
-const DATA = [
+interface Data {
+  id: number;
+  kind: string;
+  name: string;
+  preco: number;
+  uri: string;
+  user?: string; 
+  status: "active" | "inactive";
+}
+
+const DATA: Array<Data> = [
   {
     id: 1,
     kind: "novo",
@@ -47,7 +61,9 @@ const DATA = [
   }
 ]
 
-export default function Home() {
+type Props = BottomTabScreenProps<AppRoutesProps, "Home">;
+
+export default function Home({ navigation }: Props) {
   const modalRef = useRef<CustomBottomSheetModalRef>(null);
 
   function handleFilterShowModal(){
@@ -58,12 +74,24 @@ export default function Home() {
     modalRef.current?.dismiss();   
   }
 
+  function handleNavigationToCreateAnnouncement(){
+    navigation.navigate("CreateAnnouncement");
+  }
+
+  function handleNavigationToAnnouncement(){
+    navigation.navigate("Announcement");
+  }
+
+  function handleNavigationToDetails(){
+    navigation.navigate("Details");
+  }
+
   return (
     <>
       <Box className="flex-1 px-6 pt-16 relative">
-        <HomeHeader />
+        <HomeHeader onPress={handleNavigationToCreateAnnouncement} />
 
-        <Sell />
+        <Sell quantity={4} onPress={handleNavigationToAnnouncement} />
 
         <ProductFilter 
           onPress={handleFilterShowModal}
@@ -76,7 +104,13 @@ export default function Home() {
           columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 24 }}
           data={DATA}
           keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item, index }) => <CardItem data={item} index={index} />}
+          renderItem={({ item, index }) => (
+            <CardItem 
+              data={item} 
+              index={index} 
+              onPress={handleNavigationToDetails}
+            />
+          )}
         />
       </Box>
 
