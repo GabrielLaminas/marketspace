@@ -4,6 +4,10 @@ import { ScrollView } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthRoutesProps } from "@routes/auth.routes";
 
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
 import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -15,12 +19,30 @@ import CustomButton from "@components/CustomButton";
 import Logo from "@assets/logo.svg";
 
 type Props = NativeStackScreenProps<AuthRoutesProps, "SignIn">;
+type FieldProps = {
+  email: string;
+  password: string;
+}
+
+const signInSchema = yup.object({
+  email: yup.string().required("Email é obrigatório").email("O formato de email está incorreto"),
+  password: yup.string().required("Senha é obrigatório").min(6, "A senha deve ter pelo menos 6 digitos")
+})
 
 export default function SignIn({ navigation }: Props) {
+  const { control, handleSubmit, formState: { errors } } = useForm<FieldProps>({
+    defaultValues: {
+      email: "",
+      password: ""
+    }, 
+    resolver: yupResolver(signInSchema)
+  });
 
   function handleNavigationToSingUp(){
     navigation.navigate("SignUp");
   }
+
+  const onSubmit = (data: any) => console.log(data) 
 
   return (
     <ScrollView>
@@ -40,12 +62,37 @@ export default function SignIn({ navigation }: Props) {
 
           <Box>
             <VStack className="gap-4">
-              <CustomInput placeholder="E-mail" type="text" />
+              <Controller 
+                control={control}
+                name="email"
+                render={({ field: { value, onChange } }) => (
+                  <CustomInput 
+                    placeholder="E-mail" 
+                    value={value}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                    onChangeText={onChange}
+                    error={errors.email && errors.email.message}
+                  />
+                )}
+              />   
 
-              <CustomInput placeholder="Senha" type="password" />
+              <Controller 
+                control={control}
+                name="password"
+                render={({ field: { value, onChange } }) => (
+                  <CustomInput 
+                    placeholder="Senha" 
+                    type="password"
+                    value={value}
+                    onChangeText={onChange}
+                    error={errors.password && errors.password.message}
+                  />
+                )}
+              />
 
               <Box className="mt-4">
-                <CustomButton text="Entrar" variant="PRIMARY" />
+                <CustomButton text="Entrar" variant="PRIMARY" onPress={handleSubmit(onSubmit)} />
               </Box>
             </VStack>
           </Box>

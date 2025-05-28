@@ -8,7 +8,7 @@ import AuthRoutes from "./auth.routes";
 import { Box } from "@/components/ui/box";
 
 export default function Routes() {
-  const user = true;
+  const user = false;
 
   return (
     <Box className="flex-1">
