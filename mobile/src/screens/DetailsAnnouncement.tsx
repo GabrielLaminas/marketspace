@@ -1,5 +1,8 @@
-import { TouchableOpacity, ScrollView } from "react-native";
+import { ScrollView } from "react-native";
 import React from "react";
+
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { AppRoutesProps } from "@routes/app.routes";
 
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -22,8 +25,18 @@ const DATA = [
   "https://lebiscuit.vtexassets.com/arquivos/ids/21689609/17302131428199.jpg?v=638679144080530000"
 ]
 
-export default function DetailsAnnouncement() {
+type Props = BottomTabScreenProps<AppRoutesProps, "DetailsAnnouncement">;
+
+export default function DetailsAnnouncement({ navigation }: Props) {
   const inactive = false;
+
+  function handleNavigationToAnnouncement(){
+    navigation.navigate("Announcement");
+  }
+
+  function handleNavigationToEditAnnouncement(){
+    navigation.navigate("EditAnnouncement");
+  }
 
   return (
     <Box className="flex-1">
@@ -31,7 +44,9 @@ export default function DetailsAnnouncement() {
         <Box className="mt-[64px] px-[24px] mb-[12px]">
           <Header 
             iconLeft={ArrowLeft}
+            iconLeftAction={handleNavigationToAnnouncement}
             iconRight={PencilLine}
+            iconRighAction={handleNavigationToEditAnnouncement}
           />
         </Box>
 

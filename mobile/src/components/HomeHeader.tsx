@@ -9,7 +9,13 @@ import CustomButton from "./CustomButton";
 import { Plus } from "lucide-react-native";
 import Avatar from "@assets/avatar.png";
 
-export default function HomeHeader() {
+type Props = {
+  name?: string;
+  avatar?: string;
+  onPress: () => void;
+}
+
+export default function HomeHeader({ onPress }: Props) {
   return (
     <HStack space="sm" className="w-full mb-9 items-center justify-between">
       <HStack space="md" className="items-center">
@@ -31,6 +37,7 @@ export default function HomeHeader() {
         text="Criar anúncio"
         variant="SECUNDARY"
         icon={Plus}
+        onPress={onPress}
       />
     </HStack>
   );

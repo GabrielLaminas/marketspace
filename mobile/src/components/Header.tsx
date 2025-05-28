@@ -18,15 +18,17 @@ type Props = {
 export default function Header({ text, iconLeft, iconLeftAction, iconRight, iconRighAction }: Props) {
   return (
     <HStack className="items-center justify-between">
-       { iconLeft ? (
+       { iconLeft && iconLeftAction ? (
         <TouchableOpacity onPress={iconLeftAction}>
           <Icon className="w-7 h-7" color="#1A181B" as={iconLeft} /> 
         </TouchableOpacity>
       ) : <Box className="w-7 h-7" /> }
 
-      <Heading className="text-2xl text-base-100">{text}</Heading>
+      { text ? (
+        <Heading className="text-2xl text-base-100">{text}</Heading>
+      ) : <Box className="flex-1" /> }
 
-      { iconRight ? (
+      { iconRight && iconRighAction ? (
         <TouchableOpacity onPress={iconRighAction}>
           <Icon className="w-7 h-7" color="#1A181B" as={iconRight} /> 
         </TouchableOpacity>

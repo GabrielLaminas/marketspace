@@ -1,9 +1,11 @@
 import React from "react";
 import { FlatList } from "react-native";
 
+import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
+import { AppRoutesProps } from "@routes/app.routes";
+
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
-import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 
 import CustomSelect from "@components/CustomSelect";
@@ -61,13 +63,25 @@ const DATA: Array<DataProps> = [
   }
 ]
 
-export default function Announcement() {
+type Props = BottomTabScreenProps<AppRoutesProps, "Announcement">;
+
+export default function Announcement({ navigation }: Props) {
+
+  function handleNavigationToCreateAnnouncement(){
+    navigation.navigate("CreateAnnouncement");
+  }
+
+  function handleNavigationToDetailsAnnouncement(){
+    navigation.navigate("DetailsAnnouncement");
+  }
+
   return (
     <Box className="flex-1 py-[64px] px-[24px]">
       <Box className="mb-[32px]">
         <Header 
           text="Meus anúncios"
           iconRight={Plus}
+          iconRighAction={handleNavigationToCreateAnnouncement}
         />
       </Box>
 
@@ -83,7 +97,13 @@ export default function Announcement() {
         columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 24 }}
         data={DATA}
         keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item, index }) => <CardItem data={item} index={index} />}
+        renderItem={({ item, index }) => (
+          <CardItem 
+            data={item} 
+            index={index} 
+            onPress={handleNavigationToDetailsAnnouncement}
+          />
+        )}
       />
     </Box>
   );

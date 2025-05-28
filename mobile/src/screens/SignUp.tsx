@@ -1,6 +1,9 @@
 import React from "react";
 import { ScrollView } from "react-native";
 
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AuthRoutesProps } from "@routes/auth.routes";
+
 import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -16,7 +19,14 @@ import { PencilSimpleLine } from "phosphor-react-native";
 import Logo from "@assets/logo.svg";
 import Avatar from "@assets/avatar.png";
 
-export default function SignUp() {
+type Props = NativeStackScreenProps<AuthRoutesProps, "SignUp">;
+
+export default function SignUp({ navigation }: Props) {
+
+  function handleNavigationToSingIn(){
+    navigation.navigate("SignIn");
+  }
+
   return (
     <ScrollView
       contentContainerStyle={{ flexGrow: 1 }}
@@ -76,7 +86,7 @@ export default function SignUp() {
               Já tem uma conta?
             </Text>
 
-            <CustomButton text="Ir para o login" variant="NEUTRAL" />
+            <CustomButton text="Ir para o login" variant="NEUTRAL" onPress={handleNavigationToSingIn} />
           </Box>
         </VStack>
       </Box>

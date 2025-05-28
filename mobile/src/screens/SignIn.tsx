@@ -1,6 +1,9 @@
 import React from "react";
 import { ScrollView } from "react-native";
 
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AuthRoutesProps } from "@routes/auth.routes";
+
 import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
@@ -11,7 +14,14 @@ import CustomButton from "@components/CustomButton";
 
 import Logo from "@assets/logo.svg";
 
-export default function SignIn() {
+type Props = NativeStackScreenProps<AuthRoutesProps, "SignIn">;
+
+export default function SignIn({ navigation }: Props) {
+
+  function handleNavigationToSingUp(){
+    navigation.navigate("SignUp");
+  }
+
   return (
     <ScrollView>
       <Box className="px-12 pt-24 pb-16 bg-base-600 rounded-b-3xl">
@@ -47,7 +57,7 @@ export default function SignIn() {
           Ainda não tem acesso?
         </Text>
 
-        <CustomButton text="Criar uma conta" variant="NEUTRAL" />
+        <CustomButton text="Criar uma conta" variant="NEUTRAL" onPress={handleNavigationToSingUp} />
       </Box>
     </ScrollView>
   );
