@@ -92,7 +92,7 @@ export default function CreateAnnouncement({ navigation }: Props) {
           <VStack space="lg"> 
             <Heading className="mb-1.5 text-base-200 text-[16px]">Venda</Heading>
 
-            <CustomInput type="text" placeholder="Valor do produto" />
+            <CustomInput type="text" placeholder="Valor do produto" value="" isMoney />
 
             <Box>
               <Heading className="text-base text-base-200">Aceita troca?</Heading>
