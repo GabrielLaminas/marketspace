@@ -1,14 +1,12 @@
 import React, { ComponentProps, useState } from "react";
 
-import { 
-  FormControl, FormControlLabel, FormControlLabelText, 
-  FormControlError, FormControlErrorText 
-} from "@/components/ui/form-control";
+import { FormControl, FormControlLabel, FormControlLabelText, FormControlErrorText } from "@/components/ui/form-control";
 
 import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
 import { EyeIcon, EyeOffIcon } from "@/components/ui/icon";
-import RS from "@assets/rs.svg";
 import { Box } from "@/components/ui/box";
+
+import RS from "@assets/rs.svg";
 
 type Props = ComponentProps<typeof InputField> & {
   type?: "text" | "password";
@@ -20,7 +18,7 @@ type Props = ComponentProps<typeof InputField> & {
   isMoney?: boolean;
 };
 
-export default function CustomInput({ placeholder, label, value, type = "text", error, isInvalid = false, isMoney, ...rest }: Props) {
+export default function CustomInput({ placeholder, label, value, type = "text", error, isInvalid = false, isMoney = false, ...rest }: Props) {
   const [password, setPassword] = useState(false);
 
   function handleChangeEyeIcon(){
@@ -61,12 +59,8 @@ export default function CustomInput({ placeholder, label, value, type = "text", 
           </InputSlot>
         )}
       </Input>
-
-      { error && (
-        <FormControlError>
-          <FormControlErrorText className="mt-1 text-red-600 text-sm">{error}</FormControlErrorText>
-        </FormControlError>
-      )}
+      
+      { error && <FormControlErrorText className="mt-1 px-1 text-red-600 text-sm">{error}</FormControlErrorText> }
     </FormControl>
   );
 }
