@@ -1,46 +1,66 @@
-import React, { ComponentProps } from "react";
+import React, { ComponentProps, useState } from "react";
 
-import { VStack } from "@/components/ui/vstack";
-import { Text } from "@/components/ui/text";
+import { FormControl, FormControlLabel, FormControlLabelText, FormControlErrorText } from "@/components/ui/form-control";
 
 import { Input, InputField, InputSlot, InputIcon } from "@/components/ui/input";
 import { EyeIcon, EyeOffIcon } from "@/components/ui/icon";
+import { Box } from "@/components/ui/box";
 
-type Props = ComponentProps<typeof Input> & {
-  type: "text" | "password";
+import RS from "@assets/rs.svg";
+
+type Props = ComponentProps<typeof InputField> & {
+  type?: "text" | "password";
   label?: string;
   placeholder: string;
+  value: string;
+  error?: string;
+  isInvalid?: boolean;
+  isMoney?: boolean;
 };
 
-export default function CustomInput({
-  placeholder,
-  label,
-  type = "text",
-  ...rest
-}: Props) {
-  return (
-    <VStack>
-      {label && <Text>{label}</Text>}
+export default function CustomInput({ placeholder, label, value, type = "text", error, isInvalid = false, isMoney = false, ...rest }: Props) {
+  const [password, setPassword] = useState(false);
 
-      <Input
-        className="h-[45px] px-4 py-3 bg-base-700 border border-base-700 rounded-md"
-        {...rest}
-      >
+  function handleChangeEyeIcon(){
+    setPassword((prevIcon) => !prevIcon);
+  }
+
+  return (
+    <FormControl isInvalid={isInvalid}>
+      { label && (
+        <FormControlLabel>
+          <FormControlLabelText>{label}</FormControlLabelText>
+        </FormControlLabel>
+      )}
+
+      <Input className="h-[45px] px-4 py-3 bg-base-700 border border-base-700 rounded-md" isInvalid={isInvalid}>
+        { isMoney && (
+          <Box className="mr-2">
+            <RS />
+          </Box>
+        )}
+
         <InputField
-          type={type}
+          type={type === "text" ? "text" : password ? "text" : "password"}
           placeholder={placeholder}
           placeholderTextColor="#9F9BA1"
-          className="m-0 p-0 mr-2 text-base text-base-200 font-normal font-body"
+          className="m-0 p-0 text-base text-base-200 font-normal font-body"
+          value={value}
+          {...rest}
         />
 
-        <InputSlot>
-          <InputIcon
-            as={type === "password" && EyeIcon}
-            size="xl"
-            className="text-xl text-base-300"
-          />
-        </InputSlot>
+        { type === "password" && (
+          <InputSlot onPress={handleChangeEyeIcon} className="ml-2">
+            <InputIcon
+              as={password ? EyeOffIcon : EyeIcon}
+              size="xl"
+              className="text-xl text-base-300"
+            />
+          </InputSlot>
+        )}
       </Input>
-    </VStack>
+      
+      { error && <FormControlErrorText className="mt-1 px-1 text-red-600 text-sm">{error}</FormControlErrorText> }
+    </FormControl>
   );
 }
