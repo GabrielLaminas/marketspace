@@ -9,6 +9,7 @@
       "@components/*": ["./src/components/*"],
       "@routes/*": ["./src/routes/*"],
       "@screens/*": ["./src/screens/*"],
+      "@services/*": ["./src/services/*"],
       "tailwind.config": ["./tailwind.config.js"]
     },
     "jsx": "react-native"
