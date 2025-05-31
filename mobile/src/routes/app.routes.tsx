@@ -11,6 +11,7 @@ import EditAnnouncement from "@screens/EditAnnouncement";
 import PreviewAnnouncement from "@screens/PreviewAnnouncement";
 
 import { HomeIcon, Tag, LogOut } from "lucide-react-native";
+import SignOut from "@screens/SignOut";
 
 export type AppRoutesProps = {
   Home: undefined;
@@ -36,7 +37,7 @@ export default function AppRoutes() {
         tabBarActiveTintColor: "#3E3A40",
         tabBarInactiveTintColor: "#9F9BA1",
         tabBarStyle: {
-          backgroundColor: "#F7F7F8",
+          backgroundColor: "#FFF",
           borderTopWidth: 0,
         }
       }}
@@ -57,7 +58,7 @@ export default function AppRoutes() {
       />
       <Screen 
         name="Logout" 
-        component={Announcement} 
+        component={SignOut} 
         options={{
           tabBarIcon: ({}) => <LogOut color="#EE7979" size={20} />
         }}
