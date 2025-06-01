@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { ScrollView } from "react-native";
 
 import { AuthContext } from "@context/AuthContext";
@@ -35,6 +35,8 @@ const signInSchema = yup.object({
 })
 
 export default function SignIn({ navigation }: Props) {
+  const [loading, setLoading] = useState(false);
+
   const { control, handleSubmit, formState: { errors } } = useForm<FieldProps>({
     defaultValues: {
       email: "desafio2@rocketseat.com.br",
@@ -42,7 +44,7 @@ export default function SignIn({ navigation }: Props) {
     }, 
     resolver: yupResolver(signInSchema)
   });
-  const { loading, signIn } = useContext(AuthContext);
+  const { signIn } = useContext(AuthContext);
 
   const toast = useToast();
 
@@ -52,8 +54,10 @@ export default function SignIn({ navigation }: Props) {
 
   async function handleSignInUser({ email, password }: FieldProps){
     try {
+      setLoading(true);
       await signIn(email, password);
     } catch (error) {
+       setLoading(false);
       if(error instanceof Error){
         toast.show({
           id: "error-sign-in",
