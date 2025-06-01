@@ -12,6 +12,7 @@
       "@routes/*": ["./src/routes/*"],
       "@screens/*": ["./src/screens/*"],
       "@services/*": ["./src/services/*"],
+      "@storage/*": ["./src/storage/*"],
       "tailwind.config": ["./tailwind.config.js"]
     },
     "jsx": "react-native"
