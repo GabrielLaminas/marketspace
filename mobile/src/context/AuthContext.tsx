@@ -7,6 +7,10 @@ import saveUserStorage from "@storage/saveUserStorage";
 import getUserStorage from "@storage/getUserStorage";
 import removeUserStorage from "@storage/removeUserStorage";
 
+import saveAuthToken from "@storage/saveAuthToken";
+import removeAuthToken from "@storage/removeAuthToken";
+import getAuthToken from "@storage/getAuthToken";
+
 type AuthContextProps = {
   user: UserDTO;
   setUser: Dispatch<SetStateAction<UserDTO>>;
@@ -26,7 +30,14 @@ const AuthContext = createContext<AuthContextProps>({} as AuthContextProps);
 function AuthContextProvider({ children }: AuthContextProviderProps){
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserDTO>({} as UserDTO);
-  
+
+  //funcção para salvar tanto o user quanto o token.
+  function userAndTokenUpdate(userData: UserDTO, token: string){
+    //anexar a informação do token no cabeçalho
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    setUser(userData);
+  }
+
   async function signIn(email: string, password: string){
     try {
       const { data } = await api.post<UserSignInDTO>("/sessions/", { email, password }, {
@@ -35,9 +46,12 @@ function AuthContextProvider({ children }: AuthContextProviderProps){
         }
       });
 
-      if(data.user.id){
-        setUser(data.user);
-        await saveUserStorage(data);
+      if(data.token && data.user.id){
+        setLoading(true);
+        await saveAuthToken(data.token);
+        await saveUserStorage(data.user);        
+
+        userAndTokenUpdate(data.user, data.token);       
       }
     } catch (error) {
       throw error;     
@@ -74,6 +88,7 @@ function AuthContextProvider({ children }: AuthContextProviderProps){
       setLoading(true);
       setUser({} as UserDTO);
       await removeUserStorage();    
+      await removeAuthToken();
     } catch (error) {
       throw error;
     } finally {
@@ -83,11 +98,12 @@ function AuthContextProvider({ children }: AuthContextProviderProps){
 
   async function getDataUserStorage(){
     try {
-      setLoading(false);
       setLoading(true);
-      const dataUser = await getUserStorage();
-      if(dataUser){
-        setUser(dataUser.user);
+      const tokenUser = await getAuthToken();
+      const userLogged = await getUserStorage();      
+
+      if(tokenUser && userLogged){
+        userAndTokenUpdate(userLogged, tokenUser);
       }
     } catch (error) {
       throw error;
@@ -98,7 +114,7 @@ function AuthContextProvider({ children }: AuthContextProviderProps){
 
   useEffect(() => {
     getDataUserStorage();
-  }, [])
+  }, []);
 
   return (
     <AuthContext.Provider value={{
