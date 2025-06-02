@@ -1,5 +1,7 @@
-import React from "react";
+import { useContext, useState } from "react";
 import { ScrollView } from "react-native";
+
+import { AuthContext } from "@context/AuthContext";
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthRoutesProps } from "@routes/auth.routes";
@@ -12,13 +14,16 @@ import { VStack } from "@/components/ui/vstack";
 import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { Box } from "@/components/ui/box";
+import { useToast } from "@/components/ui/toast";
 
 import CustomInput from "@components/CustomInput";
 import CustomButton from "@components/CustomButton";
+import CustomToast from "@components/CustomToast";
 
 import Logo from "@assets/logo.svg";
 
 type Props = NativeStackScreenProps<AuthRoutesProps, "SignIn">;
+
 type FieldProps = {
   email: string;
   password: string;
@@ -30,19 +35,47 @@ const signInSchema = yup.object({
 })
 
 export default function SignIn({ navigation }: Props) {
+  const [loading, setLoading] = useState(false);
+
   const { control, handleSubmit, formState: { errors } } = useForm<FieldProps>({
     defaultValues: {
-      email: "",
-      password: ""
+      email: "desafio2@rocketseat.com.br",
+      password: "123456"
     }, 
     resolver: yupResolver(signInSchema)
   });
+  const { signIn } = useContext(AuthContext);
+
+  const toast = useToast();
 
   function handleNavigationToSingUp(){
     navigation.navigate("SignUp");
   }
 
-  const onSubmit = (data: any) => console.log(data) 
+  async function handleSignInUser({ email, password }: FieldProps){
+    try {
+      setLoading(true);
+      await signIn(email, password);
+    } catch (error) {
+       setLoading(false);
+      if(error instanceof Error){
+        toast.show({
+          id: "error-sign-in",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Sign In"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
+    }
+  }
 
   return (
     <ScrollView>
@@ -92,7 +125,12 @@ export default function SignIn({ navigation }: Props) {
               />
 
               <Box className="mt-4">
-                <CustomButton text="Entrar" variant="PRIMARY" onPress={handleSubmit(onSubmit)} />
+                <CustomButton 
+                  text="Entrar" 
+                  variant="PRIMARY" 
+                  onPress={handleSubmit(handleSignInUser)} 
+                  isLoading={loading}
+                />
               </Box>
             </VStack>
           </Box>

@@ -11,6 +11,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import Loading from "@components/Loading";
 import Routes from "@routes/index";
+import { AuthContextProvider } from "@context/AuthContext";
 
 export default function App() {
   const fontsLoaded = useFonts({
@@ -28,9 +29,11 @@ export default function App() {
       {
         fontsLoaded 
         ? (
-          <GestureHandlerRootView>
-            <Routes />
-          </GestureHandlerRootView>
+          <AuthContextProvider>
+            <GestureHandlerRootView>
+              <Routes />
+            </GestureHandlerRootView>
+          </AuthContextProvider>
         ) 
         : <Loading />
       }         

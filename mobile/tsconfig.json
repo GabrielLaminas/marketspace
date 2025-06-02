@@ -7,9 +7,12 @@
       "@assets/*": ["./src/assets/*"],
       "@/components/ui/*": ["./components/ui/*"],
       "@components/*": ["./src/components/*"],
+      "@context*": ["./src/context*"],
+      "@dtos/*": ["./src/dtos/*"],      
       "@routes/*": ["./src/routes/*"],
       "@screens/*": ["./src/screens/*"],
       "@services/*": ["./src/services/*"],
+      "@storage/*": ["./src/storage/*"],
       "tailwind.config": ["./tailwind.config.js"]
     },
     "jsx": "react-native"

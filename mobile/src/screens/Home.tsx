@@ -85,7 +85,7 @@ export default function Home({ navigation }: Props) {
   function handleNavigationToDetails(){
     navigation.navigate("Details");
   }
-
+  
   return (
     <>
       <Box className="flex-1 px-6 pt-16 relative">

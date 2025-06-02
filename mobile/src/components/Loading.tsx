@@ -1,4 +1,3 @@
-import React from "react";
 import { Center } from "@/components/ui/center";
 import { Spinner } from "@/components/ui/spinner";
 

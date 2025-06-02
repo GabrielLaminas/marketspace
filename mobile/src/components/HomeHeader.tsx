@@ -1,4 +1,7 @@
-import React from "react";
+import { useContext } from "react";
+
+import api from "@services/api";
+import { AuthContext } from "@context/AuthContext";
 
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
@@ -10,17 +13,18 @@ import { Plus } from "lucide-react-native";
 import Avatar from "@assets/avatar.png";
 
 type Props = {
-  name?: string;
-  avatar?: string;
   onPress: () => void;
 }
 
 export default function HomeHeader({ onPress }: Props) {
+  const { user } = useContext(AuthContext);
+  const image = `${api.defaults.baseURL}/images/${user.avatar}`
+
   return (
     <HStack space="sm" className="w-full mb-9 items-center justify-between">
       <HStack space="md" className="items-center">
         <Image
-          source={Avatar}
+          source={ user.avatar ? image : Avatar}
           alt="avatar profile"
           resizeMode="cover"
           size="none"
@@ -29,7 +33,7 @@ export default function HomeHeader({ onPress }: Props) {
 
         <Text className="text-lg text-base-100">
           Boas vindas,{"\n"}
-          <Text className="font-heading font-bold">Maria!</Text>
+          <Text className="font-heading font-bold">{user.name}!</Text>
         </Text>
       </HStack>
 
