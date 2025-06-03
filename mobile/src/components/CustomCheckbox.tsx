@@ -4,8 +4,10 @@ import {
 } from "@/components/ui/checkbox";
 import { CheckIcon } from "@/components/ui/icon";
 
+import { PaymentMethods } from "@dtos/Product";
+
 type Props = {
-  value: string;
+  value: PaymentMethods;
   label?: string;
 }
 

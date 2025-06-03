@@ -4,6 +4,10 @@ import { ScrollView, TouchableOpacity } from "react-native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { AppRoutesProps } from "@routes/app.routes";
 
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
 import { HStack } from "@/components/ui/hstack";
@@ -20,11 +24,33 @@ import CustomCheckbox from "@components/CustomCheckbox";
 import CustomInput from "@components/CustomInput";
 
 import { ArrowLeft, Plus } from "lucide-react-native";
+import { CheckboxGroup } from "@/components/ui/checkbox";
+import { ProductDTO } from "@dtos/Product";
 
 type Props = BottomTabScreenProps<AppRoutesProps, "CreateAnnouncement">;
 
+const paymentOptions = ["pix", "card", "boleto", "cash", "deposit"] as const;
+type PaymentMethods = typeof paymentOptions[number];
+
+const createSchema = yup.object({
+  name: yup.string().required("O nome do produto é obrigatório!"),
+  description: yup.string().required("A descrição do produto é obrigatório!"),
+  is_new: yup.string().required("O status do produto é obrigatório!"),
+  price: yup.string().required("O preço do produto é obrigatório!"),
+  accept_trade: yup.boolean().default(false),
+  payment_methods: yup
+    .array()
+    .of(yup.mixed<PaymentMethods>().oneOf(paymentOptions).required())
+    .min(1, "É preciso marcar pelo menos um método de pagamento!")
+    .required("Campo obrigatório"),
+})
+type CreateAnnouncementFormData = yup.InferType<typeof createSchema>;
+
+
 export default function CreateAnnouncement({ navigation }: Props) {
-  const [values, setValues] = useState("");
+  const { control, handleSubmit, formState: { errors } } = useForm<CreateAnnouncementFormData>({
+    resolver: yupResolver(createSchema)
+  });
 
   function handleNavigationToGoBack(){
     navigation.goBack();
@@ -32,6 +58,10 @@ export default function CreateAnnouncement({ navigation }: Props) {
 
   function handleNavigationToPreview(){
     navigation.navigate("PreviewAnnouncement");
+  }
+
+  function handleCreateAnnouncement(data: ProductDTO){
+    console.log(data)
   }
 
   return (
@@ -59,64 +89,120 @@ export default function CreateAnnouncement({ navigation }: Props) {
             <Heading className="mb-1.5 text-base-200 text-[16px]">Sobre o produto</Heading>
 
             <VStack space="lg" className="flex-1">
-              <CustomInput type="text" placeholder="Título do anúncio" />
+              <Controller 
+                control={control}
+                name="name"
+                render={({ field: { value, onChange } }) => (
+                  <CustomInput 
+                    type="text" 
+                    placeholder="Título do anúncio"
+                    value={value !== undefined && value !== null ? String(value) : ""}
+                    onChangeText={onChange}
+                    // error=""
+                  />
+                )}
+              />
+              
+              <Controller 
+                control={control}
+                name="description"
+                render={({ field: { value, onChange } }) => (
+                  <Textarea>
+                    <TextareaInput 
+                      type="text" 
+                      value={value}
+                      onChangeText={onChange}
+                      placeholder="Descrição do produto" 
+                      className="px-4 bg-base-700 text-base-400 text-base"                      
+                      style={{ textAlignVertical: 'top' }} 
+                    />
+                  </Textarea>
+                )}
+              />              
 
-              <Textarea>
-                <TextareaInput 
-                  placeholder="Descrição do produto" 
-                  className="px-4 bg-base-700 text-base-400 text-base" 
-                  style={{ textAlignVertical: 'top' }} 
-                />
-              </Textarea>
+              <Controller 
+                control={control}
+                name="is_new"
+                render={({ field: { value, onChange } }) => (
+                  <RadioGroup value={String(value)} onChange={onChange}>
+                    <HStack space="xl">
+                      <Radio value="true">
+                        <RadioIndicator>
+                          <RadioIcon as={CircleIcon} />
+                        </RadioIndicator>
+                        <RadioLabel className="text-lg text-base-200">Produto novo</RadioLabel>
+                      </Radio>
 
-              <RadioGroup value={values} onChange={setValues}>
-                <HStack space="xl">
-                  <Radio value="new">
-                    <RadioIndicator>
-                      <RadioIcon as={CircleIcon} />
-                    </RadioIndicator>
-                    <RadioLabel className="text-lg text-base-200">Produto novo</RadioLabel>
-                  </Radio>
-
-                  <Radio value="used">
-                    <RadioIndicator>
-                      <RadioIcon as={CircleIcon} />
-                    </RadioIndicator>
-                    <RadioLabel className="text-lg text-base-200">Produto usado</RadioLabel>
-                  </Radio>
-                </HStack>
-              </RadioGroup>
+                      <Radio value="false">
+                        <RadioIndicator>
+                          <RadioIcon as={CircleIcon} />
+                        </RadioIndicator>
+                        <RadioLabel className="text-lg text-base-200">Produto usado</RadioLabel>
+                      </Radio>
+                    </HStack>
+                  </RadioGroup>
+                )}
+              />    
             </VStack>          
           </Box>
 
           <VStack space="lg"> 
             <Heading className="mb-1.5 text-base-200 text-[16px]">Venda</Heading>
-
-            <CustomInput type="text" placeholder="Valor do produto" value="" isMoney />
+            
+            <Controller 
+              control={control}
+              name="price"
+              render={({ field: { value, onChange } }) => (
+                <CustomInput 
+                  type="text" 
+                  keyboardType="numeric"
+                  placeholder="Valor do produto" 
+                  value={value}
+                  onChangeText={onChange} 
+                  isMoney 
+                />
+              )}
+            />            
 
             <Box>
               <Heading className="text-base text-base-200">Aceita troca?</Heading>
 
               <HStack className="justify-start">
-                <Switch 
-                  size="lg"
-                  trackColor={{ false: "#D9D8DA", true: "#647AC7" }}
-                  thumbColor="#F7F7F8"
-                  ios_backgroundColor="#D9D8DA"
-                />
+                <Controller 
+                  control={control}
+                  name="accept_trade"
+                  render={({ field: { value, onChange } }) => (
+                    <Switch 
+                      value={value}
+                      onToggle={onChange}
+                      size="lg"
+                      trackColor={{ false: "#D9D8DA", true: "#647AC7" }}
+                      thumbColor="#F7F7F8"
+                      ios_backgroundColor="#D9D8DA"
+                    />
+                  )}
+                />                 
               </HStack>
             </Box>
 
             <Box>
               <Heading className="mb-[12px] text-base text-base-200">Meios de pagamento aceitos</Heading>
 
-              <VStack space="md" className="mt-2">
-                <CustomCheckbox value="Boleto" />
-                <CustomCheckbox value="Pix" />
-                <CustomCheckbox value="Dinheiro" />
-                <CustomCheckbox value="Cartão de Crédito" />
-                <CustomCheckbox value="Depósito Bancário" />
-              </VStack>
+              <Controller 
+                control={control}
+                name="payment_methods"
+                render={({ field: { value, onChange } }) => (
+                  <CheckboxGroup value={value} onChange={onChange}>
+                    <VStack space="md" className="mt-2">
+                      <CustomCheckbox label="Boleto" value="boleto" /> 
+                      <CustomCheckbox label="Pix" value="pix" />
+                      <CustomCheckbox label="Dinheiro" value="cash" />
+                      <CustomCheckbox label="Cartão de Crédito" value="card" />
+                      <CustomCheckbox label="Depósito Bancário" value="deposit" />
+                    </VStack>
+                  </CheckboxGroup>  
+                )}
+              />
             </Box>
           </VStack>          
         </VStack>
@@ -134,7 +220,7 @@ export default function CreateAnnouncement({ navigation }: Props) {
             text="Avançar"
             variant="SECUNDARY"
             style={{ flex: 1 }}
-            onPress={handleNavigationToPreview}
+            onPress={handleSubmit(handleCreateAnnouncement)}
           />
         </HStack>
       </Box>
