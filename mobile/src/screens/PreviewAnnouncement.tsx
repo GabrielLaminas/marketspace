@@ -14,8 +14,8 @@ import { Image } from "@/components/ui/image";
 
 import CustomButton from "@components/CustomButton";
 import Carousel from "@components/Carousel";
+import PaymentMethodsList from "@components/PaymentMethodsList";
 
-import { Barcode, Bank, Money, QrCode, CreditCard } from "phosphor-react-native";
 import { ArrowLeft, Tag } from "lucide-react-native";
 
 const DATA = [
@@ -26,15 +26,39 @@ const DATA = [
 
 type Props = BottomTabScreenProps<AppRoutesProps, "PreviewAnnouncement">;
 
-export default function PreviewAnnouncement({ navigation }: Props) {
+export default function PreviewAnnouncement({ route, navigation }: Props) {
   const inactive = false;
 
+  const params = route.params;
+
   function handleNavigationGoBack(){
-    navigation.goBack();
+    navigation.goBack()
   }
 
   function handleNavigationDetailsAnnouncement(){
-    navigation.navigate("DetailsAnnouncement");
+    console.log({
+      name: params.name,
+      description: params.description,
+      is_new: !!params.is_new,
+      price: Number(params.price),
+      accept_trade: params.accept_trade,
+      payment_methods: params.payment_methods
+    })
+
+    // const { data, status } = await api.post<ProductCreated>("/products/", {
+    //   name: params.name,
+    //   description: params.description,
+    //   is_new: !!params.is_new,
+    //   price: Number(params.price),
+    //   accept_trade: params.accept_trade,
+    //   payment_methods: [...params.payment_methods]
+    // })
+
+    // if(status === 200 || status === 201){
+    //   navigation.navigate("PreviewAnnouncement");
+    // }
+
+    // navigation.navigate("DetailsAnnouncement");
   }
 
   return (
@@ -65,34 +89,36 @@ export default function PreviewAnnouncement({ navigation }: Props) {
 
           <VStack space="sm" className="items-start">
             <Badge className="px-[8px] py-[2px] bg-base-500 rounded-full">
-              <BadgeText className="uppercase font-heading text-center text-base-200">Novo</BadgeText>
+              <BadgeText className="uppercase font-heading text-center text-base-200">{ params.is_new === "true" ? "Novo" : "Usado" }</BadgeText>
             </Badge>
 
             <HStack className="w-full justify-between items-center">
-              <Heading className="text-base-100 text-2xl">Bicicleta</Heading>
+              <Heading className="text-base-100 text-2xl">{params.name}</Heading>
 
-              <Heading className="text-product-secundary text-2xl">
-                <Text className="text-product-secundary text-base mr-2">R$</Text>
-                120,00
-              </Heading>
+              <HStack className="items-center">
+                <Text className="text-product-secundary text-base mr-1">R$</Text>
+                <Heading className="text-product-secundary text-2xl">{params.price}</Heading>
+              </HStack>
             </HStack>
 
-            <Text className="w-full text-base text-base-200">
-              Cras congue cursus in tortor sagittis placerat nunc, tellus arcu. Vitae ante leo eget maecenas urna mattis cursus. Mauris metus amet nibh mauris mauris accumsan, euismod. Aenean leo nunc, purus iaculis in aliquam.
-            </Text>
+            <Text className="w-full text-base text-base-200">{params.description}</Text>
           </VStack>
 
           <HStack space="md" className="items-center">
             <Heading className="text-base-200 text-base">Aceita troca?</Heading>
-            <Text className="text-base-200 text-base">Sim</Text>
+            <Text className="text-base-200 text-base">{ params.accept_trade ? "Sim" : "Não" }</Text>
           </HStack>
 
           <VStack space="md">
             <Heading className="text-base-200 text-base">Meios de pagamento:</Heading>
+            
+            <PaymentMethodsList
+              paymentsMethods={params.payment_methods}
+            />
 
-            <VStack space="md">
+            {/* PRECISA REFATORAR <VStack space="md">
               <HStack space="sm" className="items-center">
-                <Barcode size={20} color="#1A181B" />
+                <Barcode size={20} color="#1A181B" titleId="boleto"/>
                 <Text className="text-base-200 text-base">Boleto</Text>
               </HStack>
 
@@ -115,7 +141,7 @@ export default function PreviewAnnouncement({ navigation }: Props) {
                 <Bank size={20} color="#1A181B" />
                 <Text className="text-base-200 text-base">Depósito Bancário</Text>
               </HStack>
-            </VStack>
+            </VStack> */}
           </VStack>
         </VStack>
       </ScrollView>
