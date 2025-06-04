@@ -9,9 +9,11 @@ import DetailsAnnouncement from "@screens/DetailsAnnouncement";
 import CreateAnnouncement from "@screens/CreateAnnouncement";
 import EditAnnouncement from "@screens/EditAnnouncement";
 import PreviewAnnouncement from "@screens/PreviewAnnouncement";
+import SignOut from "@screens/SignOut";
 
 import { HomeIcon, Tag, LogOut } from "lucide-react-native";
-import SignOut from "@screens/SignOut";
+
+import { ProductDTO } from "@dtos/Product";
 
 export type AppRoutesProps = {
   Home: undefined;
@@ -21,7 +23,7 @@ export type AppRoutesProps = {
   DetailsAnnouncement: undefined;
   CreateAnnouncement: undefined;
   EditAnnouncement: undefined;
-  PreviewAnnouncement: undefined;
+  PreviewAnnouncement: ProductDTO;
 }
 
 const { Navigator, Screen } = createBottomTabNavigator<AppRoutesProps>();

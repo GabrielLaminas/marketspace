@@ -9,4 +9,17 @@ interface ProductDTO {
   "payment_methods": PaymentMethods[];
 }
 
-export { ProductDTO, PaymentMethods };
+interface ProductCreated {
+  accept_trade: boolean; 
+  created_at: string; 
+  description: string; 
+  id: string; 
+  is_active: boolean; 
+  is_new: boolean; 
+  name: string; 
+  price: 230; 
+  updated_at: string; 
+  user_id: string;
+}
+
+export { ProductDTO, PaymentMethods, ProductCreated };
