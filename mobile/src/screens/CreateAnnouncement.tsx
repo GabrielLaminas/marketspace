@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -46,7 +45,6 @@ const createSchema = yup.object({
 })
 type CreateAnnouncementFormData = yup.InferType<typeof createSchema>;
 
-
 export default function CreateAnnouncement({ navigation }: Props) {
   const { control, handleSubmit, formState: { errors } } = useForm<CreateAnnouncementFormData>({
     resolver: yupResolver(createSchema)
@@ -56,12 +54,30 @@ export default function CreateAnnouncement({ navigation }: Props) {
     navigation.goBack();
   }
 
-  function handleNavigationToPreview(){
-    navigation.navigate("PreviewAnnouncement");
-  }
+  async function handleCreateAnnouncement(body: ProductDTO){
+    try {
+      const data = await createSchema.validate({
+        name: body.name,
+        description: body.description,
+        is_new: body.is_new,
+        price: body.price,
+        accept_trade: body.accept_trade,
+        payment_methods: body.payment_methods
+      }, { abortEarly: false })
 
-  function handleCreateAnnouncement(data: ProductDTO){
-    console.log(data)
+      if(data.name && data.description && data.is_new && data.price && data.payment_methods.length > 0){
+        navigation.navigate("PreviewAnnouncement", { 
+          name: data.name, 
+          description: data.description, 
+          is_new: data.is_new,
+          price: data.price,
+          accept_trade: data.accept_trade,
+          payment_methods: data.payment_methods
+        });
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
@@ -98,27 +114,30 @@ export default function CreateAnnouncement({ navigation }: Props) {
                     placeholder="Título do anúncio"
                     value={value !== undefined && value !== null ? String(value) : ""}
                     onChangeText={onChange}
-                    // error=""
+                    error={errors.name && errors.name.message}
                   />
                 )}
               />
               
-              <Controller 
-                control={control}
-                name="description"
-                render={({ field: { value, onChange } }) => (
-                  <Textarea>
-                    <TextareaInput 
-                      type="text" 
-                      value={value}
-                      onChangeText={onChange}
-                      placeholder="Descrição do produto" 
-                      className="px-4 bg-base-700 text-base-400 text-base"                      
-                      style={{ textAlignVertical: 'top' }} 
-                    />
-                  </Textarea>
-                )}
-              />              
+              <VStack>
+                <Controller 
+                  control={control}
+                  name="description"
+                  render={({ field: { value, onChange } }) => (
+                    <Textarea>
+                      <TextareaInput 
+                        type="text" 
+                        value={value}
+                        onChangeText={onChange}
+                        placeholder="Descrição do produto" 
+                        className="px-4 bg-base-700 text-base-400 text-base"                      
+                        style={{ textAlignVertical: 'top' }} 
+                      />
+                    </Textarea>
+                  )}
+                />   
+                { errors.description && <Text className="mt-1 px-1 text-red-600 text-sm">{errors.description.message}</Text> }
+              </VStack>     
 
               <Controller 
                 control={control}
@@ -140,6 +159,7 @@ export default function CreateAnnouncement({ navigation }: Props) {
                         <RadioLabel className="text-lg text-base-200">Produto usado</RadioLabel>
                       </Radio>
                     </HStack>
+                    { errors.is_new && <Text className="mt-1 px-1 text-red-600 text-sm">{errors.is_new.message}</Text> }
                   </RadioGroup>
                 )}
               />    
@@ -160,6 +180,7 @@ export default function CreateAnnouncement({ navigation }: Props) {
                   value={value}
                   onChangeText={onChange} 
                   isMoney 
+                  error={ errors.price && errors.price.message }
                 />
               )}
             />            
@@ -200,6 +221,7 @@ export default function CreateAnnouncement({ navigation }: Props) {
                       <CustomCheckbox label="Cartão de Crédito" value="card" />
                       <CustomCheckbox label="Depósito Bancário" value="deposit" />
                     </VStack>
+                    { errors.payment_methods && <Text className="mt-2 px-1 text-red-600 text-sm">{errors.payment_methods.message}</Text> }
                   </CheckboxGroup>  
                 )}
               />
