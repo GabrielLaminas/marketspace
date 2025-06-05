@@ -79,7 +79,7 @@ export default function Home({ navigation }: Props) {
   }
 
   function handleNavigationToAnnouncement(){
-    navigation.navigate("Announcement");
+    navigation.navigate("Announcements");
   }
 
   function handleNavigationToDetails(){

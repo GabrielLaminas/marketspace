@@ -4,24 +4,28 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import Home from "@screens/Home";
 import Details from "@screens/Details";
-import Announcement from "@screens/Announcement";
+import Announcements from "@screens/Announcements";
 import DetailsAnnouncement from "@screens/DetailsAnnouncement";
 import CreateAnnouncement from "@screens/CreateAnnouncement";
 import EditAnnouncement from "@screens/EditAnnouncement";
 import PreviewAnnouncement from "@screens/PreviewAnnouncement";
+import SignOut from "@screens/SignOut";
 
 import { HomeIcon, Tag, LogOut } from "lucide-react-native";
-import SignOut from "@screens/SignOut";
+
+import { ProductDTO } from "@dtos/Product";
 
 export type AppRoutesProps = {
   Home: undefined;
-  Announcement: undefined;
+  Announcements: undefined;
   Logout: undefined;
   Details: undefined;
-  DetailsAnnouncement: undefined;
+  DetailsAnnouncement: {
+    id: string;
+  };
   CreateAnnouncement: undefined;
   EditAnnouncement: undefined;
-  PreviewAnnouncement: undefined;
+  PreviewAnnouncement: ProductDTO;
 }
 
 const { Navigator, Screen } = createBottomTabNavigator<AppRoutesProps>();
@@ -50,8 +54,8 @@ export default function AppRoutes() {
         }}
       />
       <Screen 
-        name="Announcement" 
-        component={Announcement} 
+        name="Announcements" 
+        component={Announcements} 
         options={{
           tabBarIcon: ({color}) => <Tag color={color} size={20} />
         }}

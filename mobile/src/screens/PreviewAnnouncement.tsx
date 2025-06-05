@@ -1,8 +1,13 @@
 import { ScrollView, SafeAreaView } from "react-native";
-import React from "react";
+import { useContext } from "react";
 
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { AppRoutesProps } from "@routes/app.routes";
+
+import { AuthContext } from "@context/AuthContext";
+
+import api from "@services/api";
+import { ProductCreated } from "@dtos/Product";
 
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -14,8 +19,8 @@ import { Image } from "@/components/ui/image";
 
 import CustomButton from "@components/CustomButton";
 import Carousel from "@components/Carousel";
+import PaymentMethodsList from "@components/PaymentMethodsList";
 
-import { Barcode, Bank, Money, QrCode, CreditCard } from "phosphor-react-native";
 import { ArrowLeft, Tag } from "lucide-react-native";
 
 const DATA = [
@@ -26,15 +31,28 @@ const DATA = [
 
 type Props = BottomTabScreenProps<AppRoutesProps, "PreviewAnnouncement">;
 
-export default function PreviewAnnouncement({ navigation }: Props) {
-  const inactive = false;
+export default function PreviewAnnouncement({ route, navigation }: Props) {
+  const { user } = useContext(AuthContext);
+
+  const params = route.params;
 
   function handleNavigationGoBack(){
-    navigation.goBack();
+    navigation.navigate("CreateAnnouncement");
   }
 
-  function handleNavigationDetailsAnnouncement(){
-    navigation.navigate("DetailsAnnouncement");
+  async function handleNavigationDetailsAnnouncement(){
+    const { data, status } = await api.post<ProductCreated>("/products/", {
+      name: params.name,
+      description: params.description,
+      is_new: params.is_new === "true" ? true : false,
+      price: Number(params.price),
+      accept_trade: params.accept_trade,
+      payment_methods: params.payment_methods
+    })
+
+    if(status === 200 || status === 201){
+      navigation.navigate("DetailsAnnouncement", { id: data.id });
+    }
   }
 
   return (
@@ -47,75 +65,50 @@ export default function PreviewAnnouncement({ navigation }: Props) {
       <ScrollView showsVerticalScrollIndicator={false}>
         <Carousel 
           data={DATA}
-          inactiveAd={inactive}
+          inactiveAd={false}
         />
 
         <VStack space="2xl" className="px-[24px] pt-[22px] pb-[26px]">
           <HStack space="sm" className="items-center">
             <Image 
-              source={{ uri: "https://mighty.tools/mockmind-api/content/human/104.jpg" }}
+              source={{ uri: `${api.defaults.baseURL}/images/${user.avatar}` }}
               size="none"
               width={28}
               height={28}
               alt="nome qualquer"
               className="rounded-full border-2 border-product-secundary bg-slate-400"
             />
-            <Text className="text-base text-base-100">Makenna Baptista</Text>
+            <Text className="text-base text-base-100">{user.name}</Text>
           </HStack>
 
           <VStack space="sm" className="items-start">
             <Badge className="px-[8px] py-[2px] bg-base-500 rounded-full">
-              <BadgeText className="uppercase font-heading text-center text-base-200">Novo</BadgeText>
+              <BadgeText className="uppercase font-heading text-center text-base-200">{ params.is_new === "true" ? "Novo" : "Usado" }</BadgeText>
             </Badge>
 
             <HStack className="w-full justify-between items-center">
-              <Heading className="text-base-100 text-2xl">Bicicleta</Heading>
+              <Heading className="text-base-100 text-2xl">{params.name}</Heading>
 
-              <Heading className="text-product-secundary text-2xl">
-                <Text className="text-product-secundary text-base mr-2">R$</Text>
-                120,00
-              </Heading>
+              <HStack className="items-center">
+                <Text className="text-product-secundary text-base mr-1">R$</Text>
+                <Heading className="text-product-secundary text-2xl">{params.price}</Heading>
+              </HStack>
             </HStack>
 
-            <Text className="w-full text-base text-base-200">
-              Cras congue cursus in tortor sagittis placerat nunc, tellus arcu. Vitae ante leo eget maecenas urna mattis cursus. Mauris metus amet nibh mauris mauris accumsan, euismod. Aenean leo nunc, purus iaculis in aliquam.
-            </Text>
+            <Text className="w-full text-base text-base-200">{params.description}</Text>
           </VStack>
 
           <HStack space="md" className="items-center">
             <Heading className="text-base-200 text-base">Aceita troca?</Heading>
-            <Text className="text-base-200 text-base">Sim</Text>
+            <Text className="text-base-200 text-base">{ params.accept_trade ? "Sim" : "Não" }</Text>
           </HStack>
 
           <VStack space="md">
             <Heading className="text-base-200 text-base">Meios de pagamento:</Heading>
-
-            <VStack space="md">
-              <HStack space="sm" className="items-center">
-                <Barcode size={20} color="#1A181B" />
-                <Text className="text-base-200 text-base">Boleto</Text>
-              </HStack>
-
-              <HStack space="sm" className="items-center">
-                <QrCode size={20} color="#1A181B" />
-                <Text className="text-base-200 text-base">Pix</Text>
-              </HStack>
-
-              <HStack space="sm" className="items-center">
-                <Money size={20} color="#1A181B" />
-                <Text className="text-base-200 text-base">Dinheiro</Text>
-              </HStack>
-
-              <HStack space="sm" className="items-center">
-                <CreditCard size={20} color="#1A181B" />
-                <Text className="text-base-200 text-base">Cartão de Crédito</Text>
-              </HStack>
-
-              <HStack space="sm" className="items-center">
-                <Bank size={20} color="#1A181B" />
-                <Text className="text-base-200 text-base">Depósito Bancário</Text>
-              </HStack>
-            </VStack>
+            
+            <PaymentMethodsList
+              paymentsMethods={params.payment_methods}
+            />
           </VStack>
         </VStack>
       </ScrollView>
