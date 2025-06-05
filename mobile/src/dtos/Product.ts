@@ -22,4 +22,19 @@ interface ProductCreated {
   user_id: string;
 }
 
-export { ProductDTO, PaymentMethods, ProductCreated };
+interface Methods {
+  key: string; 
+  name: string;
+}
+
+interface ProductData extends ProductCreated {
+  payment_methods: Methods[],
+  product_images: string[], 
+  user: {
+    avatar: string; 
+    name: string;
+    tel: string;
+  }, 
+}
+
+export { ProductDTO, PaymentMethods, ProductCreated, ProductData };

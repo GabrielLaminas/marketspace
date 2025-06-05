@@ -1,8 +1,13 @@
 import { ScrollView, SafeAreaView } from "react-native";
-import React from "react";
+import { useContext } from "react";
 
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { AppRoutesProps } from "@routes/app.routes";
+
+import { AuthContext } from "@context/AuthContext";
+
+import api from "@services/api";
+import { ProductCreated } from "@dtos/Product";
 
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -27,38 +32,27 @@ const DATA = [
 type Props = BottomTabScreenProps<AppRoutesProps, "PreviewAnnouncement">;
 
 export default function PreviewAnnouncement({ route, navigation }: Props) {
-  const inactive = false;
+  const { user } = useContext(AuthContext);
 
   const params = route.params;
 
   function handleNavigationGoBack(){
-    navigation.goBack()
+    navigation.navigate("CreateAnnouncement");
   }
 
-  function handleNavigationDetailsAnnouncement(){
-    console.log({
+  async function handleNavigationDetailsAnnouncement(){
+    const { data, status } = await api.post<ProductCreated>("/products/", {
       name: params.name,
       description: params.description,
-      is_new: !!params.is_new,
+      is_new: params.is_new === "true" ? true : false,
       price: Number(params.price),
       accept_trade: params.accept_trade,
       payment_methods: params.payment_methods
     })
 
-    // const { data, status } = await api.post<ProductCreated>("/products/", {
-    //   name: params.name,
-    //   description: params.description,
-    //   is_new: !!params.is_new,
-    //   price: Number(params.price),
-    //   accept_trade: params.accept_trade,
-    //   payment_methods: [...params.payment_methods]
-    // })
-
-    // if(status === 200 || status === 201){
-    //   navigation.navigate("PreviewAnnouncement");
-    // }
-
-    // navigation.navigate("DetailsAnnouncement");
+    if(status === 200 || status === 201){
+      navigation.navigate("DetailsAnnouncement", { id: data.id });
+    }
   }
 
   return (
@@ -71,20 +65,20 @@ export default function PreviewAnnouncement({ route, navigation }: Props) {
       <ScrollView showsVerticalScrollIndicator={false}>
         <Carousel 
           data={DATA}
-          inactiveAd={inactive}
+          inactiveAd={false}
         />
 
         <VStack space="2xl" className="px-[24px] pt-[22px] pb-[26px]">
           <HStack space="sm" className="items-center">
             <Image 
-              source={{ uri: "https://mighty.tools/mockmind-api/content/human/104.jpg" }}
+              source={{ uri: `${api.defaults.baseURL}/images/${user.avatar}` }}
               size="none"
               width={28}
               height={28}
               alt="nome qualquer"
               className="rounded-full border-2 border-product-secundary bg-slate-400"
             />
-            <Text className="text-base text-base-100">Makenna Baptista</Text>
+            <Text className="text-base text-base-100">{user.name}</Text>
           </HStack>
 
           <VStack space="sm" className="items-start">
@@ -115,33 +109,6 @@ export default function PreviewAnnouncement({ route, navigation }: Props) {
             <PaymentMethodsList
               paymentsMethods={params.payment_methods}
             />
-
-            {/* PRECISA REFATORAR <VStack space="md">
-              <HStack space="sm" className="items-center">
-                <Barcode size={20} color="#1A181B" titleId="boleto"/>
-                <Text className="text-base-200 text-base">Boleto</Text>
-              </HStack>
-
-              <HStack space="sm" className="items-center">
-                <QrCode size={20} color="#1A181B" />
-                <Text className="text-base-200 text-base">Pix</Text>
-              </HStack>
-
-              <HStack space="sm" className="items-center">
-                <Money size={20} color="#1A181B" />
-                <Text className="text-base-200 text-base">Dinheiro</Text>
-              </HStack>
-
-              <HStack space="sm" className="items-center">
-                <CreditCard size={20} color="#1A181B" />
-                <Text className="text-base-200 text-base">Cartão de Crédito</Text>
-              </HStack>
-
-              <HStack space="sm" className="items-center">
-                <Bank size={20} color="#1A181B" />
-                <Text className="text-base-200 text-base">Depósito Bancário</Text>
-              </HStack>
-            </VStack> */}
           </VStack>
         </VStack>
       </ScrollView>

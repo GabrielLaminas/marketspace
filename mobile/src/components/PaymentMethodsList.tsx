@@ -15,8 +15,8 @@ export default function PaymentMethodsList({ paymentsMethods }: Props) {
   return (
     <VStack space="md">
       { 
-        paymentsMethods.map((methods, index) => (
-          <HStack space="sm" className="items-center" key={methods + index}>
+        paymentsMethods?.map((methods, index) => (
+          <HStack space="sm" className="items-center" key={index}>
             { 
               methods === "boleto" 
               ? <Barcode size={20} color="#1A181B" /> 
