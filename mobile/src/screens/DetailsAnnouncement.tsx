@@ -5,7 +5,7 @@ import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { AppRoutesProps } from "@routes/app.routes";
 
 import api from "@services/api";
-import { PaymentMethods, ProductData } from "@dtos/Product";
+import { PaymentMethods, ProductData, ImagesPickerProps } from "@dtos/Product";
 
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -21,19 +21,13 @@ import Header from "@components/Header";
 import PaymentMethodsList from "@components/PaymentMethodsList";
 import Loading from "@components/Loading"
 
-import { Barcode, Bank, Money, QrCode, CreditCard } from "phosphor-react-native";
 import { ArrowLeft, PencilLine, Power, Trash } from "lucide-react-native";
-
-const DATA = [
-  "https://cdn.awsli.com.br/600x700/1259/1259538/produto/238747959/img_6666-8zgzqibzh0.jpg",
-  "https://down-br.img.susercontent.com/file/sg-11134201-7rd57-lwyqk6femsfa96",
-  "https://lebiscuit.vtexassets.com/arquivos/ids/21689609/17302131428199.jpg?v=638679144080530000"
-]
 
 type Props = BottomTabScreenProps<AppRoutesProps, "DetailsAnnouncement">;
 
 export default function DetailsAnnouncement({ navigation, route }: Props) {
   const [product, setProduct] = useState<ProductData>({} as ProductData);
+  const [images, setImages] = useState<ImagesPickerProps[]>([]);
   const [loading, setLoading] = useState(false);
 
   const announcementId = route.params.id;
@@ -49,7 +43,17 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
   async function getProduct(id: string){
     try {
       setLoading(true);
-      const { data } = await api.get(`/products/${id}`);
+      const { data } = await api.get<ProductData>(`/products/${id}`);
+
+      const image: ImagesPickerProps[] = data.product_images.map((image) => {
+        return {
+          name: image.path,
+          uri: `${api.defaults.baseURL}/images/${image.path}`,
+          type: `image/${image.path.split(".")[1]}`
+        }
+      });
+      
+      setImages(image);
       setProduct(data);
     } catch (error) {
       console.log(error);
@@ -60,7 +64,7 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
 
   useEffect(() => {
     getProduct(announcementId);
-  }, [announcementId])
+  }, [announcementId]);
 
 
   if(loading){
@@ -80,7 +84,7 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
         </Box>
 
         <Carousel 
-          data={DATA}
+          data={images}
           inactiveAd={!product.is_active}
         />
 
