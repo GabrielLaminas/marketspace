@@ -1,7 +1,7 @@
-import { ProductCreated } from "./Product";
+import { ProductCreated, ProductImages } from "./Product";
 
 interface UserProduct extends ProductCreated {
-  "product_images": string[], 
+  "product_images": ProductImages[], 
 }
 
 export { UserProduct };

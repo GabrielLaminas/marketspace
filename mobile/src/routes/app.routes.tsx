@@ -13,7 +13,7 @@ import SignOut from "@screens/SignOut";
 
 import { HomeIcon, Tag, LogOut } from "lucide-react-native";
 
-import { ProductDTO } from "@dtos/Product";
+import { ProductDTO, ImagesPickerProps } from "@dtos/Product";
 
 export type AppRoutesProps = {
   Home: undefined;
@@ -25,7 +25,9 @@ export type AppRoutesProps = {
   };
   CreateAnnouncement: undefined;
   EditAnnouncement: undefined;
-  PreviewAnnouncement: ProductDTO;
+  PreviewAnnouncement: ProductDTO & { 
+    images: ImagesPickerProps[] 
+  };
 }
 
 const { Navigator, Screen } = createBottomTabNavigator<AppRoutesProps>();

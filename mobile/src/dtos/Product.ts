@@ -1,5 +1,19 @@
 type PaymentMethods = "pix" | "card" | "boleto" | "cash" | "deposit";
 
+interface ImagesPickerProps {
+  name: string;
+  uri: string;
+  type: string;
+}
+
+interface ImagesCreated {
+  id: string;
+  path: string;
+  product_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface ProductDTO {
   "name": string;
   "description": string;
@@ -27,9 +41,14 @@ interface Methods {
   name: string;
 }
 
+interface ProductImages {
+  id: string; 
+  path: string;
+}
+
 interface ProductData extends ProductCreated {
   payment_methods: Methods[],
-  product_images: string[], 
+  product_images: ProductImages[], 
   user: {
     avatar: string; 
     name: string;
@@ -37,4 +56,4 @@ interface ProductData extends ProductCreated {
   }, 
 }
 
-export { ProductDTO, PaymentMethods, ProductCreated, ProductData };
+export { ProductDTO, PaymentMethods, ProductCreated, ProductData, ImagesPickerProps, ImagesCreated, ProductImages };
