@@ -8,7 +8,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import { ProductDTO } from "@dtos/Product";
+import { ProductDTO, ImagesPickerProps } from "@dtos/Product";
 
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
@@ -33,17 +33,12 @@ import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 
 import { ArrowLeft, Plus } from "lucide-react-native";
+import { XCircle } from "phosphor-react-native";
 
 type Props = BottomTabScreenProps<AppRoutesProps, "CreateAnnouncement">;
 
 const paymentOptions = ["pix", "card", "boleto", "cash", "deposit"] as const;
 type PaymentMethods = typeof paymentOptions[number];
-
-type ImagePickerProps = {
-  name: string;
-  uri: string;
-  type: string;
-}
 
 const createSchema = yup.object({
   name: yup.string().required("O nome do produto é obrigatório!"),
@@ -56,11 +51,12 @@ const createSchema = yup.object({
     .of(yup.mixed<PaymentMethods>().oneOf(paymentOptions).required())
     .min(1, "É preciso marcar pelo menos um método de pagamento!")
     .required("Campo obrigatório"),
-})
+});
+
 type CreateAnnouncementFormData = yup.InferType<typeof createSchema>;
 
 export default function CreateAnnouncement({ navigation }: Props) {
-  const [avatar, setAvatar] = useState<ImagePickerProps[]>([]);
+  const [avatar, setAvatar] = useState<ImagesPickerProps[]>([]);
 
   const { control, handleSubmit, formState: { errors } } = useForm<CreateAnnouncementFormData>({
     resolver: yupResolver(createSchema)
@@ -101,11 +97,11 @@ export default function CreateAnnouncement({ navigation }: Props) {
       const fileExtension = imageSelected.assets[0].uri.split('.').pop();
 
       //precisa enviar para o backend essas informações de imagem.
-      const photoFile: ImagePickerProps = {
+      const photoFile: ImagesPickerProps = {
         name: `${imageSelected.assets[0].fileName}`.toLowerCase(),
         uri: imageURI,
         type: `${imageSelected.assets[0].type}/${fileExtension}`
-      } ;
+      };
 
       setAvatar((prevAvatar) => [...prevAvatar, photoFile]);
     } catch (error) {
@@ -139,6 +135,10 @@ export default function CreateAnnouncement({ navigation }: Props) {
         payment_methods: body.payment_methods
       }, { abortEarly: false })
 
+      if(avatar.length === 0){
+        throw new Error("É obrigatório o envio de imagens.");
+      }
+
       if(data.name && data.description && data.is_new && data.price && data.payment_methods.length > 0){
         navigation.navigate("PreviewAnnouncement", { 
           name: data.name, 
@@ -146,15 +146,34 @@ export default function CreateAnnouncement({ navigation }: Props) {
           is_new: data.is_new,
           price: data.price,
           accept_trade: data.accept_trade,
-          payment_methods: data.payment_methods
+          payment_methods: data.payment_methods,
+          images: avatar
         });
       }
     } catch (error) {
-      console.log(error)
+      if(error instanceof Error){  
+        toast.show({
+          id: "error-create-announcement",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Criar anúncio"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
     }
   }
 
-  console.log(avatar[0])
+  function handleRemoveAvatar(id: string){
+    const avatars = avatar.filter(({ name }) => name !== id);
+    setAvatar(avatars);
+  }
 
   return (
     <VStack className="flex-1">
@@ -175,7 +194,7 @@ export default function CreateAnnouncement({ navigation }: Props) {
             <HStack space="md" className="flex-wrap">
               {
                 avatar.length > 0 && avatar.map(({ name, uri }) => (
-                  <Box className="w-[100px] h-[100px]" key={name}>
+                  <Box className="w-[100px] h-[100px] relative" key={name}>
                     <Image 
                       source={{ uri: uri }}
                       size="none"
@@ -184,12 +203,18 @@ export default function CreateAnnouncement({ navigation }: Props) {
                       alt="nome qualquer"
                       className="bg-base-500 rounded-lg"
                     />
+                    <TouchableOpacity 
+                      className="absolute right-1 top-1 z-10 w-5 h-5 rounded-full justify-center items-center bg-white"
+                      onPress={() => handleRemoveAvatar(name)}
+                    >
+                      <XCircle size={24} color="#3E3A40" weight="fill"   />
+                    </TouchableOpacity>
                   </Box>
                 ))
               }             
 
               <TouchableOpacity 
-                className={`w-[100px] h-[100px] justify-center items-center bg-base-500 rounded-lg ${avatar.length === 3 ? 'opacity-50' : 'opacity-100'}`} 
+                className={`w-[100px] h-[100px] justify-center items-center bg-base-500 rounded-lg ${avatar.length === 3 ? 'opacity-30' : 'opacity-100'}`} 
                 disabled={avatar.length === 3} onPress={handlePickImage}
               >
                 <Plus size={24} color="#9F9BA1" />
