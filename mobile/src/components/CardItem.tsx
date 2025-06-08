@@ -1,6 +1,11 @@
 import React, { useContext } from "react";
 import { TouchableOpacity } from "react-native";
 
+import api from "@services/api";
+import { UserProduct } from "@dtos/UserProduct";
+
+import { AuthContext } from "@context/AuthContext";
+
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
 import { VStack } from "@/components/ui/vstack";
@@ -8,8 +13,6 @@ import { Text } from "@/components/ui/text";
 import { Heading } from "@/components/ui/heading";
 import { Image } from "@/components/ui/image";
 import { Badge, BadgeText } from "@/components/ui/badge";
-import { UserProduct } from "@dtos/UserProduct";
-import { AuthContext } from "@context/AuthContext";
 
 type Props = {
   data: UserProduct;
@@ -18,19 +21,21 @@ type Props = {
 }
 
 export default function CardItem({ data, index, onPress }: Props) {
-  const user = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
   return (
     <TouchableOpacity onPress={onPress} style={{ flex: 1 }}>
       <VStack className={`flex-1 ${index % 2 === 0 && "mr-[20px]"}`}>
         <Box className="relative overflow-hidden rounded-md">
-          {/* <Image 
-            source={{ uri: data.uri }}
-            size="none"
-            alt={data.name}
-            resizeMode="cover"
-            className="w-full h-[100px] rounded-md bg-slate-700"
-          /> */}
+          { data?.product_images && (
+            <Image 
+              source={{ uri: `${api.defaults.baseURL}/images/${data.product_images[0]?.path}` }}
+              size="none"
+              alt={data.name}
+              resizeMode="cover"
+              className="w-full h-[100px] rounded-md bg-base-500"
+            />
+          )}
 
           { data.is_active === false && (
             <Box className="size-full absolute left-0 top-0 z-10 p-2 bg-base-100/45 flex justify-end">
@@ -38,20 +43,20 @@ export default function CardItem({ data, index, onPress }: Props) {
             </Box>
           )}     
           
-          {/* <HStack className={`w-full absolute left-0 top-0 p-1 ${data.user ? "justify-between" : "justify-end"}`}> */}
-          <HStack className={`w-full absolute left-0 top-0 p-1 justify-end`}>
-            {/* {
-              data.user && (
+          <HStack className={`w-full absolute left-0 top-0 p-1 ${user.id !== data.user_id ? "justify-between" : "justify-end"}`}>
+            {
+              user.id !== data.user_id && (
                 <Image 
-                  source={{ uri: data.user }}
+                  source={{ uri: `${api.defaults.baseURL}/images/${user.avatar}` }}
                   size="none"
                   width={24}
                   height={24}
-                  alt={data.name}
+                  alt={user.name}
+                  resizeMode="center"
                   className="rounded-full border-2 border-base-700 bg-slate-400"
                 />
               )
-            } */}
+            }
             <Badge className="px-[8px] py-[2px] rounded-full bg-product-primary">
               <BadgeText className="uppercase font-heading font-bold text-center text-base-700">{data.is_new ? "Novo" : "Usado"}</BadgeText>
             </Badge>
