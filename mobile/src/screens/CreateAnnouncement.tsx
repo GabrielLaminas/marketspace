@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -6,6 +7,8 @@ import { AppRoutesProps } from "@routes/app.routes";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+
+import { ProductDTO, ImagesPickerProps } from "@dtos/Product";
 
 import { Box } from "@/components/ui/box";
 import { VStack } from "@/components/ui/vstack";
@@ -16,15 +19,21 @@ import { Textarea, TextareaInput } from "@/components/ui/textarea";
 import { Radio, RadioGroup, RadioIndicator, RadioLabel, RadioIcon } from "@/components/ui/radio";
 import { CircleIcon } from "@/components/ui/icon";
 import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/components/ui/toast";
+import { Image } from "@/components/ui/image";
+import { CheckboxGroup } from "@/components/ui/checkbox";
 
 import Header from "@components/Header";
 import CustomButton from "@components/CustomButton";
 import CustomCheckbox from "@components/CustomCheckbox";
 import CustomInput from "@components/CustomInput";
+import CustomToast from "@components/CustomToast";
+
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 
 import { ArrowLeft, Plus } from "lucide-react-native";
-import { CheckboxGroup } from "@/components/ui/checkbox";
-import { ProductDTO } from "@dtos/Product";
+import { XCircle } from "phosphor-react-native";
 
 type Props = BottomTabScreenProps<AppRoutesProps, "CreateAnnouncement">;
 
@@ -42,16 +51,77 @@ const createSchema = yup.object({
     .of(yup.mixed<PaymentMethods>().oneOf(paymentOptions).required())
     .min(1, "É preciso marcar pelo menos um método de pagamento!")
     .required("Campo obrigatório"),
-})
+});
+
 type CreateAnnouncementFormData = yup.InferType<typeof createSchema>;
 
 export default function CreateAnnouncement({ navigation }: Props) {
+  const [avatar, setAvatar] = useState<ImagesPickerProps[]>([]);
+
   const { control, handleSubmit, formState: { errors } } = useForm<CreateAnnouncementFormData>({
     resolver: yupResolver(createSchema)
   });
 
+  const toast = useToast();
+
   function handleNavigationToGoBack(){
     navigation.goBack();
+  }
+
+  async function handlePickImage(){
+    try {
+      if(avatar.length > 2){
+        throw new Error("Você excedeu a quantidade de imagens para mostrar!");
+      }
+
+      const imageSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1
+      });
+
+      if(imageSelected.canceled) return;
+
+      const imageURI = imageSelected.assets[0].uri;
+
+      if(!imageURI) return;
+
+      const photoInfo = await FileSystem.getInfoAsync(imageURI) as { size: number }
+      
+      /*a expressão (photoInfo.size / 1024 / 1024) converte o tamanho da imagem de bytes para megabytes, dividindo primeiro por 1024 para obter kilobytes e novamente por 1024 para obter megabytes. */
+      if(photoInfo.size && (photoInfo.size / 1024 / 1024) > 5){
+        throw new Error("Essa imagem é muito grande. Escolha uma de até 5MB")
+      }
+
+      const fileExtension = imageSelected.assets[0].uri.split('.').pop();
+
+      //precisa enviar para o backend essas informações de imagem.
+      const photoFile: ImagesPickerProps = {
+        name: `${imageSelected.assets[0].fileName}`.toLowerCase(),
+        uri: imageURI,
+        type: `${imageSelected.assets[0].type}/${fileExtension}`
+      };
+
+      setAvatar((prevAvatar) => [...prevAvatar, photoFile]);
+    } catch (error) {
+      if(error instanceof Error){  
+        toast.show({
+          id: "error-pick-image",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Criar anúncio"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
+    }
   }
 
   async function handleCreateAnnouncement(body: ProductDTO){
@@ -65,6 +135,10 @@ export default function CreateAnnouncement({ navigation }: Props) {
         payment_methods: body.payment_methods
       }, { abortEarly: false })
 
+      if(avatar.length === 0){
+        throw new Error("É obrigatório o envio de imagens.");
+      }
+
       if(data.name && data.description && data.is_new && data.price && data.payment_methods.length > 0){
         navigation.navigate("PreviewAnnouncement", { 
           name: data.name, 
@@ -72,12 +146,33 @@ export default function CreateAnnouncement({ navigation }: Props) {
           is_new: data.is_new,
           price: data.price,
           accept_trade: data.accept_trade,
-          payment_methods: data.payment_methods
+          payment_methods: data.payment_methods,
+          images: avatar
         });
       }
     } catch (error) {
-      console.log(error)
+      if(error instanceof Error){  
+        toast.show({
+          id: "error-create-announcement",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Criar anúncio"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
     }
+  }
+
+  function handleRemoveAvatar(id: string){
+    const avatars = avatar.filter(({ name }) => name !== id);
+    setAvatar(avatars);
   }
 
   return (
@@ -96,9 +191,35 @@ export default function CreateAnnouncement({ navigation }: Props) {
             <Heading className="mb-1.5 text-base-200 text-[16px]">Imagens</Heading>
             <Text className="mb-5 text-base-300 text-base">Escolha até 3 imagens para mostrar o quando o seu produto é incrível!</Text>
 
-            <TouchableOpacity className="w-[100px] h-[100px] justify-center items-center bg-base-500 rounded-lg">
-              <Plus size={24} color="#9F9BA1" />
-            </TouchableOpacity>
+            <HStack space="md" className="flex-wrap">
+              {
+                avatar.length > 0 && avatar.map(({ name, uri }) => (
+                  <Box className="w-[100px] h-[100px] relative" key={name}>
+                    <Image 
+                      source={{ uri: uri }}
+                      size="none"
+                      width={100}
+                      height={100}
+                      alt="nome qualquer"
+                      className="bg-base-500 rounded-lg"
+                    />
+                    <TouchableOpacity 
+                      className="absolute right-1 top-1 z-10 w-5 h-5 rounded-full justify-center items-center bg-white"
+                      onPress={() => handleRemoveAvatar(name)}
+                    >
+                      <XCircle size={24} color="#3E3A40" weight="fill"   />
+                    </TouchableOpacity>
+                  </Box>
+                ))
+              }             
+
+              <TouchableOpacity 
+                className={`w-[100px] h-[100px] justify-center items-center bg-base-500 rounded-lg ${avatar.length === 3 ? 'opacity-30' : 'opacity-100'}`} 
+                disabled={avatar.length === 3} onPress={handlePickImage}
+              >
+                <Plus size={24} color="#9F9BA1" />
+              </TouchableOpacity>
+            </HStack>
           </Box>
 
           <Box>

@@ -7,7 +7,7 @@ import { AppRoutesProps } from "@routes/app.routes";
 import { AuthContext } from "@context/AuthContext";
 
 import api from "@services/api";
-import { ProductCreated } from "@dtos/Product";
+import { ImagesCreated, ProductCreated, ImagesPickerProps } from "@dtos/Product";
 
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -23,12 +23,6 @@ import PaymentMethodsList from "@components/PaymentMethodsList";
 
 import { ArrowLeft, Tag } from "lucide-react-native";
 
-const DATA = [
-  "https://cdn.awsli.com.br/600x700/1259/1259538/produto/238747959/img_6666-8zgzqibzh0.jpg",
-  "https://down-br.img.susercontent.com/file/sg-11134201-7rd57-lwyqk6femsfa96",
-  "https://lebiscuit.vtexassets.com/arquivos/ids/21689609/17302131428199.jpg?v=638679144080530000"
-]
-
 type Props = BottomTabScreenProps<AppRoutesProps, "PreviewAnnouncement">;
 
 export default function PreviewAnnouncement({ route, navigation }: Props) {
@@ -41,17 +35,40 @@ export default function PreviewAnnouncement({ route, navigation }: Props) {
   }
 
   async function handleNavigationDetailsAnnouncement(){
-    const { data, status } = await api.post<ProductCreated>("/products/", {
-      name: params.name,
-      description: params.description,
-      is_new: params.is_new === "true" ? true : false,
-      price: Number(params.price),
-      accept_trade: params.accept_trade,
-      payment_methods: params.payment_methods
-    })
+    try {
+      const { data: product, status: productStatus } = await api.post<ProductCreated>("/products/", {
+        name: params.name,
+        description: params.description,
+        is_new: params.is_new === "true" ? true : false,
+        price: Number(params.price),
+        accept_trade: params.accept_trade,
+        payment_methods: params.payment_methods
+      });
 
-    if(status === 200 || status === 201){
-      navigation.navigate("DetailsAnnouncement", { id: data.id });
+      if((productStatus === 200 || productStatus === 201) && product.id){
+        const imageFormData = new FormData();
+
+        imageFormData.append("product_id", product.id);
+        params.images.forEach((image: ImagesPickerProps) => {
+          imageFormData.append("images", {
+            uri: image.uri,
+            name: image.name,
+            type: image.type,
+          } as any);
+        });
+
+        const { data, status } = await api.post<ImagesCreated[]>("/products/images/", imageFormData, { 
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        });
+
+        if(status === 200 || status === 201){
+          navigation.navigate("DetailsAnnouncement", { id: data[0].product_id });
+        }
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 
@@ -64,7 +81,7 @@ export default function PreviewAnnouncement({ route, navigation }: Props) {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <Carousel 
-          data={DATA}
+          data={params.images}
           inactiveAd={false}
         />
 

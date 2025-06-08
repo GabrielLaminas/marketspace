@@ -2,6 +2,8 @@ import { View, Dimensions } from "react-native";
 import { useSharedValue } from "react-native-reanimated"
 import RNCarousel from "react-native-reanimated-carousel";
 
+import { ImagesPickerProps } from "@dtos/Product";
+
 import { Image } from "@/components/ui/image";
 import { Box } from "@/components/ui/box";
 import { Heading } from "@/components/ui/heading";
@@ -9,7 +11,7 @@ import { Heading } from "@/components/ui/heading";
 const screenWidth = Dimensions.get("window").width;
 
 type Props = {
-  data: string[];
+  data: ImagesPickerProps[];
   inactiveAd?: boolean;
 }
 
@@ -19,7 +21,7 @@ export default function Carousel({ data, inactiveAd = false }: Props) {
   return (
     <View id="carousel-component" style={{ position: 'relative' }}>
       <RNCarousel 
-        autoPlay={inactiveAd ? false : true}
+        autoPlay={inactiveAd || data.length === 1 ? false : true}
         autoPlayInterval={5000}
         data={data}
         height={280}
@@ -37,7 +39,7 @@ export default function Carousel({ data, inactiveAd = false }: Props) {
         renderItem={({ item, index }) => (
           <Box>
             <Image 
-              source={{ uri: item }}
+              source={{ uri: item.uri }}
               width={screenWidth}
               height={280}
               size="none"
