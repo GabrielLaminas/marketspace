@@ -14,12 +14,14 @@ import { HStack } from "@/components/ui/hstack";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Heading } from "@/components/ui/heading";
 import { Image } from "@/components/ui/image";
+import { useToast } from "@/components/ui/toast";
 
 import CustomButton from "@components/CustomButton";
 import Carousel from "@components/Carousel";
 import Header from "@components/Header";
 import PaymentMethodsList from "@components/PaymentMethodsList";
 import Loading from "@components/Loading"
+import CustomToast from "@components/CustomToast";
 
 import { ArrowLeft, PencilLine, Power, Trash } from "lucide-react-native";
 
@@ -30,6 +32,7 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
   const [images, setImages] = useState<ImagesPickerProps[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const toast = useToast();
   const announcementId = route.params.id;
 
   function handleNavigationToAnnouncement(){
@@ -59,6 +62,48 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
       console.log(error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function removeProduct(id: string){
+    try {
+      const { status } = await api.delete(`/products/${id}`);
+
+      if(status === 204){
+        toast.show({
+          id: "remove-product",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title={`Anúncio ${product.name}`}
+              action="success"
+              message={`Anúncio Excluido com sucesso!`}
+            />
+          )
+        });
+
+        navigation.navigate("Announcements");
+      }
+    } catch (error) {
+      if(error instanceof Error){
+        toast.show({
+          id: "error-remove-product",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title={`Anúncio ${product.name}`}
+              action="error"
+              message={error.message}
+            />
+          )
+        });
+      }
     }
   }
 
@@ -159,6 +204,7 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
             text="Excluir anúncio"
             variant="NEUTRAL"
             icon={Trash}
+            onPress={() => removeProduct(product.id)}
           />
         </VStack>
       </Box>
