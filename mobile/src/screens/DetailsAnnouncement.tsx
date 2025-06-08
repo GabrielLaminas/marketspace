@@ -1,5 +1,5 @@
-import { ScrollView } from "react-native";
 import { useEffect, useState } from "react";
+import { ScrollView } from "react-native";
 
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { AppRoutesProps } from "@routes/app.routes";
@@ -65,6 +65,48 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
     }
   }
 
+  async function inactiveProduct(id: string, is_active: boolean){
+    try {
+      const { status } = await api.patch(`/products/${id}`, { is_active: !is_active });
+      
+      if(status === 204){
+        setProduct((prevProduct) => ({ ...prevProduct, is_active: !is_active }));
+        
+        toast.show({
+          id: "update-product",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title={`Anúncio ${product.name}`}
+              action="success"
+              message={`Anúncio foi ${ is_active ? "Desativado" : "Reativado" } com sucesso!`}
+            />
+          )
+        });
+      }
+    } catch (error) {
+      if(error instanceof Error){
+        toast.show({
+          id: "error-update-product",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title={`Anúncio ${product.name}`}
+              action="error"
+              message={error.message}
+            />
+          )
+        });
+      }
+    }
+  }
+
   async function removeProduct(id: string){
     try {
       const { status } = await api.delete(`/products/${id}`);
@@ -110,7 +152,6 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
   useEffect(() => {
     getProduct(announcementId);
   }, [announcementId]);
-
 
   if(loading){
     return <Loading />
@@ -190,12 +231,14 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
                 text="Reativar anúncio"
                 variant="PRIMARY"
                 icon={Power}
+                onPress={() => inactiveProduct(product.id, product.is_active)}
               />
             ) : (
               <CustomButton 
                 text="Desativar anúncio"
                 variant="SECUNDARY"
                 icon={Power}
+                onPress={() => inactiveProduct(product.id, product.is_active)}
               />
             )
           }
