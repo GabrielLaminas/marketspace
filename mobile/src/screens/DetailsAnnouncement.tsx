@@ -40,7 +40,18 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
   }
 
   function handleNavigationToEditAnnouncement(){
-    navigation.navigate("EditAnnouncement");
+    const payment_methods = product.payment_methods.map(({ key }) => key as PaymentMethods);
+
+    navigation.navigate("EditAnnouncement", { 
+      name: product.name, 
+      description: product.description, 
+      accept_trade: product.accept_trade, 
+      images,
+      is_new: product.is_new ? "true" : "false", 
+      payment_methods: payment_methods, 
+      price: String(product.price),
+      id: announcementId 
+    });
   }
 
   async function getProduct(id: string){

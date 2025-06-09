@@ -24,9 +24,13 @@ export type AppRoutesProps = {
     id: string;
   };
   CreateAnnouncement: undefined;
-  EditAnnouncement: undefined;
-  PreviewAnnouncement: ProductDTO & { 
+  EditAnnouncement: ProductDTO & { 
+    id: string; 
     images: ImagesPickerProps[] 
+  };
+  PreviewAnnouncement: ProductDTO & { 
+    id?: string; 
+    images: ImagesPickerProps[]
   };
 }
 
