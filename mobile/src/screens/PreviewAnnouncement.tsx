@@ -1,13 +1,13 @@
 import { ScrollView, SafeAreaView } from "react-native";
 import { useContext } from "react";
 
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { AppRoutesProps } from "@routes/app.routes";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { AuthContext } from "@context/AuthContext";
 
 import api from "@services/api";
-import { ImagesCreated, ProductCreated, ImagesPickerProps } from "@dtos/Product";
+import { ImagesCreated, ProductCreated, ImagesPickerProps, ProductDTO } from "@dtos/Product";
 
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -16,25 +16,33 @@ import { HStack } from "@/components/ui/hstack";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Heading } from "@/components/ui/heading";
 import { Image } from "@/components/ui/image";
+import { useToast } from "@/components/ui/toast";
 
 import CustomButton from "@components/CustomButton";
 import Carousel from "@components/Carousel";
 import PaymentMethodsList from "@components/PaymentMethodsList";
+import CustomToast from "@components/CustomToast";
 
 import { ArrowLeft, Tag } from "lucide-react-native";
 
-type Props = BottomTabScreenProps<AppRoutesProps, "PreviewAnnouncement">;
+type PreviewRouteProps = ProductDTO & { 
+  id?: string;  
+  images: ImagesPickerProps[]
+}
 
-export default function PreviewAnnouncement({ route, navigation }: Props) {
+export default function PreviewAnnouncement() {
   const { user } = useContext(AuthContext);
+  const route = useRoute();
+  const params = route.params as PreviewRouteProps;
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
 
-  const params = route.params;
+  const toast = useToast();  
 
   function handleNavigationGoBack(){
     navigation.navigate("CreateAnnouncement");
   }
 
-  async function handleNavigationDetailsAnnouncement(){
+  async function handleCreateAnnouncement(){
     try {
       const { data: product, status: productStatus } = await api.post<ProductCreated>("/products/", {
         name: params.name,
@@ -65,10 +73,88 @@ export default function PreviewAnnouncement({ route, navigation }: Props) {
 
         if(status === 200 || status === 201){
           navigation.navigate("DetailsAnnouncement", { id: data[0].product_id });
+          toast.show({
+            id: "success-preview-announcement",
+            placement: "top",
+            duration: 5000,
+            containerStyle: { marginTop: 48 },
+            render: ({ id }) => (
+              <CustomToast 
+                id={id}
+                title="Visualização do anúncio"
+                action="success"
+                message="Anúncio publicado com sucesso!"
+              />
+            )
+          })
         }
       }
     } catch (error) {
-      console.log(error);
+      if(error instanceof Error){  
+        toast.show({
+          id: "error-preview-announcement",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Visualização do anúncio"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
+    }
+  }
+
+  async function handleEditAnnouncement(){
+    try {
+      const { status } = await api.put(`/products/${params.id}`, {
+        name: params.name,
+        description: params.description,
+        is_new: params.is_new === "true" ? true : false,
+        price: Number(params.price),
+        accept_trade: params.accept_trade,
+        payment_methods: params.payment_methods
+      });
+
+      if(status === 204 && params.id){
+        navigation.navigate("DetailsAnnouncement", { id: params.id });
+
+        toast.show({
+          id: "success-preview-announcement",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Visualização do anúncio"
+              action="success"
+              message="Anúncio atualizado com sucesso!"
+            />
+          )
+        })
+      }
+    } catch (error) {
+      if(error instanceof Error){  
+        toast.show({
+          id: "error-preview-announcement",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Atualização do anúncio"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
     }
   }
 
@@ -145,7 +231,7 @@ export default function PreviewAnnouncement({ route, navigation }: Props) {
             variant="PRIMARY"
             icon={Tag}
             style={{ flex: 1 }}
-            onPress={handleNavigationDetailsAnnouncement}
+            onPress={params.id ? () => handleEditAnnouncement() : () => handleCreateAnnouncement()}
           />
         </HStack>
       </Box>
