@@ -1,6 +1,8 @@
 import React from "react";
 
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { BottomTabNavigationProp, createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import { ProductDTO, ImagesPickerProps } from "@dtos/Product";
 
 import Home from "@screens/Home";
 import Details from "@screens/Details";
@@ -13,9 +15,7 @@ import SignOut from "@screens/SignOut";
 
 import { HomeIcon, Tag, LogOut } from "lucide-react-native";
 
-import { ProductDTO, ImagesPickerProps } from "@dtos/Product";
-
-export type AppRoutesProps = {
+type AppRoutes = {
   Home: undefined;
   Announcements: undefined;
   Logout: undefined;
@@ -34,7 +34,9 @@ export type AppRoutesProps = {
   };
 }
 
-const { Navigator, Screen } = createBottomTabNavigator<AppRoutesProps>();
+export type AppNavigatorRoutesProps = BottomTabNavigationProp<AppRoutes>;
+
+const { Navigator, Screen } = createBottomTabNavigator<AppRoutes>();
 
 export default function AppRoutes() { 
   return (
