@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { ScrollView } from "react-native";
 
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { AppRoutesProps } from "@routes/app.routes";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 
 import api from "@services/api";
 import { PaymentMethods, ProductData, ImagesPickerProps } from "@dtos/Product";
@@ -25,15 +25,20 @@ import CustomToast from "@components/CustomToast";
 
 import { ArrowLeft, PencilLine, Power, Trash } from "lucide-react-native";
 
-type Props = BottomTabScreenProps<AppRoutesProps, "DetailsAnnouncement">;
+type RouteParamsProps = {
+  id: string;
+}
 
-export default function DetailsAnnouncement({ navigation, route }: Props) {
+export default function DetailsAnnouncement() {
   const [product, setProduct] = useState<ProductData>({} as ProductData);
   const [images, setImages] = useState<ImagesPickerProps[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
+  const route = useRoute();
+  const { id } = route.params as RouteParamsProps; 
+
   const toast = useToast();
-  const announcementId = route.params.id;
 
   function handleNavigationToAnnouncement(){
     navigation.navigate("Announcements");
@@ -50,11 +55,11 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
       is_new: product.is_new ? "true" : "false", 
       payment_methods: payment_methods, 
       price: String(product.price),
-      id: announcementId 
+      id: id 
     });
   }
 
-  async function getProduct(id: string){
+  async function getProductById(){
     try {
       setLoading(true);
       const { data } = await api.get<ProductData>(`/products/${id}`);
@@ -91,9 +96,9 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
           render: ({ id }) => (
             <CustomToast 
               id={id}
-              title={`Anúncio ${product.name}`}
+              title={`${product.name}`}
               action="success"
-              message={`Anúncio foi ${ is_active ? "Desativado" : "Reativado" } com sucesso!`}
+              message={`Anúncio foi ${ is_active ? "desativado" : "reativado" }!`}
             />
           )
         });
@@ -160,9 +165,11 @@ export default function DetailsAnnouncement({ navigation, route }: Props) {
     }
   }
 
-  useEffect(() => {
-    getProduct(announcementId);
-  }, [announcementId]);
+  useFocusEffect(
+    useCallback(() => {
+      getProductById();
+    }, [id])
+  );
 
   if(loading){
     return <Loading />
