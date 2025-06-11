@@ -1,13 +1,15 @@
 import { ScrollView, SafeAreaView } from "react-native";
-import { useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 
 import { AuthContext } from "@context/AuthContext";
 
 import api from "@services/api";
-import { ImagesCreated, ProductCreated, ImagesPickerProps, ProductDTO } from "@dtos/Product";
+import { 
+  ImagesCreated, ProductCreated, ImagesPickerProps, ProductDTO, ProductData 
+} from "@dtos/Product";
 
 import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
@@ -32,6 +34,8 @@ type PreviewRouteProps = ProductDTO & {
 
 export default function PreviewAnnouncement() {
   const { user } = useContext(AuthContext);
+  const [imagesSelected, setImagesSelected] = useState<ImagesPickerProps[]>([]);
+
   const route = useRoute();
   const params = route.params as PreviewRouteProps;
   const navigation = useNavigation<AppNavigatorRoutesProps>();
@@ -121,22 +125,43 @@ export default function PreviewAnnouncement() {
       });
 
       if(status === 204 && params.id){
-        navigation.navigate("DetailsAnnouncement", { id: params.id });
+        const imagesNames = new Set(imagesSelected.map(item => item.name));
+        const newImages = params.images.filter(({ name }) => !imagesNames.has(name))
+        
+        const imageFormData = new FormData();
 
-        toast.show({
-          id: "success-preview-announcement",
-          placement: "top",
-          duration: 5000,
-          containerStyle: { marginTop: 48 },
-          render: ({ id }) => (
-            <CustomToast 
-              id={id}
-              title="Visualização do anúncio"
-              action="success"
-              message="Anúncio atualizado com sucesso!"
-            />
-          )
-        })
+        imageFormData.append("product_id", params.id);
+        newImages.forEach((image: ImagesPickerProps) => {
+          imageFormData.append("images", {
+            uri: image.uri,
+            name: image.name,
+            type: image.type,
+          } as any);
+        });
+        
+        const { status } = await api.post<ImagesCreated[]>("/products/images/", imageFormData, { 
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
+        });
+
+        if(status === 200 || status === 201){
+          navigation.navigate("DetailsAnnouncement", { id: params.id });
+          toast.show({
+            id: "success-preview-announcement",
+            placement: "top",
+            duration: 5000,
+            containerStyle: { marginTop: 48 },
+            render: ({ id }) => (
+              <CustomToast 
+                id={id}
+                title="Visualização do anúncio"
+                action="success"
+                message="Anúncio atualizado com sucesso!"
+              />
+            )
+          })     
+        }         
       }
     } catch (error) {
       if(error instanceof Error){  
@@ -157,6 +182,30 @@ export default function PreviewAnnouncement() {
       }
     }
   }
+
+  async function getSelectImage(){
+    const { data } = await api.get<ProductData>(`/products/${params.id}`);
+    const image: ImagesPickerProps[] = data.product_images.map((image) => {
+      return {
+        id: image.id,
+        name: image.path,
+        uri: `${api.defaults.baseURL}/images/${image.path}`,
+        type: `image/${image.path.split(".")[1]}`
+      }
+    });
+    if(data.id){
+      setImagesSelected(image);
+    }
+  }
+
+  // console.log("Selected: ", imagesSelected);
+  // console.log("Via Edit: ", params.images)
+
+  useFocusEffect(
+    useCallback(() => {
+      getSelectImage();
+    }, [params])
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

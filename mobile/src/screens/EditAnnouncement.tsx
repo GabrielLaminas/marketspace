@@ -59,7 +59,7 @@ type EditRouteProps = ProductDTO & {
 };
 
 export default function EditAnnouncement() {
-  const [avatar, setAvatar] = useState<ImagesPickerProps[]>([]);
+  const [images, setImages] = useState<ImagesPickerProps[]>([]);
 
   const route = useRoute();
   const params = route.params as EditRouteProps;
@@ -67,7 +67,7 @@ export default function EditAnnouncement() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const toast = useToast();  
 
-  const { control, handleSubmit, reset, formState: { errors, defaultValues } } = useForm<EditAnnouncementFormData>({
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<EditAnnouncementFormData>({
     resolver: yupResolver(editSchema),
     defaultValues: {
       name: params.name,
@@ -85,7 +85,7 @@ export default function EditAnnouncement() {
 
   async function handlePickImage(){
     try {
-      if(avatar.length > 2){
+      if(images.length > 2){
         throw new Error("Você excedeu a quantidade de imagens para mostrar!");
       }
 
@@ -118,7 +118,7 @@ export default function EditAnnouncement() {
         type: `${imageSelected.assets[0].type}/${fileExtension}`
       };
 
-      setAvatar((prevAvatar) => [...prevAvatar, photoFile]);
+      setImages((prevAvatar) => [...prevAvatar, photoFile]);
     } catch (error) {
       if(error instanceof Error){  
         toast.show({
@@ -139,9 +139,9 @@ export default function EditAnnouncement() {
     }
   }
 
-  function handleRemoveAvatar(id: string){
-    const avatars = avatar.filter(({ name }) => name !== id);
-    setAvatar(avatars);
+  function handleRemoveImage(id: string){
+    const newImage = images.filter(({ name }) => name !== id);
+    setImages(newImage);
   }
 
   async function handleEditAnnouncement(body: ProductDTO){
@@ -155,7 +155,7 @@ export default function EditAnnouncement() {
         payment_methods: body.payment_methods
       }, { abortEarly: false })
 
-      if(avatar.length === 0){
+      if(images.length === 0){
         throw new Error("É obrigatório o envio de imagens.");
       }
 
@@ -168,7 +168,7 @@ export default function EditAnnouncement() {
           price: data.price,
           accept_trade: data.accept_trade,
           payment_methods: data.payment_methods,
-          images: avatar
+          images: images
         });
       }
     } catch (error) {
@@ -200,7 +200,7 @@ export default function EditAnnouncement() {
       price: params.price,
       payment_methods: params.payment_methods
     });
-    setAvatar(params.images);
+    setImages(params.images);
   }
 
   useEffect(() => {
@@ -225,7 +225,7 @@ export default function EditAnnouncement() {
 
             <HStack space="md" className="flex-wrap">
               {
-                avatar.length > 0 && avatar.map(({ name, uri }) => (
+                images.length > 0 && images.map(({ name, uri }) => (
                   <Box className="w-[100px] h-[100px] relative" key={name}>
                     <Image 
                       source={{ uri: uri }}
@@ -237,7 +237,7 @@ export default function EditAnnouncement() {
                     />
                     <TouchableOpacity 
                       className="absolute right-1 top-1 z-10 w-5 h-5 rounded-full justify-center items-center bg-white"
-                      onPress={() => handleRemoveAvatar(name)}
+                      onPress={() => handleRemoveImage(name)}
                     >
                       <XCircle size={24} color="#3E3A40" weight="fill"   />
                     </TouchableOpacity>
@@ -246,8 +246,8 @@ export default function EditAnnouncement() {
               }             
 
               <TouchableOpacity 
-                className={`w-[100px] h-[100px] justify-center items-center bg-base-500 rounded-lg ${avatar.length === 3 ? 'opacity-30' : 'opacity-100'}`} 
-                disabled={avatar.length === 3} onPress={handlePickImage}
+                className={`w-[100px] h-[100px] justify-center items-center bg-base-500 rounded-lg ${images.length === 3 ? 'opacity-30' : 'opacity-100'}`} 
+                disabled={images.length === 3} onPress={handlePickImage}
               >
                 <Plus size={24} color="#9F9BA1" />
               </TouchableOpacity>
