@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { Alert, ScrollView, TouchableOpacity } from "react-native";
 
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
+import api from "@services/api";
 import { ImagesPickerProps, ProductDTO } from "@dtos/Product";
 
 import { useForm, Controller } from "react-hook-form";
@@ -53,13 +54,17 @@ const editSchema = yup.object({
 
 type EditAnnouncementFormData = yup.InferType<typeof editSchema>;
 
+type ImagesProps = ImagesPickerProps & {
+  id?: string;
+}
+
 type EditRouteProps = ProductDTO & { 
   id: string; 
-  images: ImagesPickerProps[] 
+  images: ImagesProps[];
 };
 
 export default function EditAnnouncement() {
-  const [images, setImages] = useState<ImagesPickerProps[]>([]);
+  const [images, setImages] = useState<ImagesProps[]>([]);
 
   const route = useRoute();
   const params = route.params as EditRouteProps;
@@ -112,7 +117,7 @@ export default function EditAnnouncement() {
       const fileExtension = imageSelected.assets[0].uri.split('.').pop();
 
       //precisa enviar para o backend essas informações de imagem.
-      const photoFile: ImagesPickerProps = {
+      const photoFile: ImagesProps = {
         name: `${imageSelected.assets[0].fileName}`.toLowerCase(),
         uri: imageURI,
         type: `${imageSelected.assets[0].type}/${fileExtension}`
@@ -139,9 +144,59 @@ export default function EditAnnouncement() {
     }
   }
 
-  function handleRemoveImage(id: string){
-    const newImage = images.filter(({ name }) => name !== id);
-    setImages(newImage);
+  function handleRemoveImage(name: string, id?: string){
+    if(!id) return;
+
+    Alert.alert(
+      "Remover imagem",
+      "Tem certeza que deseja remover a imagem?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        {
+          text: "Excluir",
+          style: "destructive",
+          onPress: async () => {
+            await removeImageProducts(name, id);
+          }
+        }
+      ]
+    );
+  }
+
+  async function removeImageProducts(name: string, id: string){
+    try {
+      const newImage = images.filter((image) => image.name !== name);
+      const imagesIds = images.filter((image) => image.id === id).map((image) => image.id);
+
+      const { status } = await api.delete("/products/images/", {
+        data: {
+          productImagesIds: imagesIds
+        }
+      });
+
+      if(status === 204){
+        setImages(newImage);
+        toast.show({
+          id: "success-remove-image",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Editar anúncio"
+              action="success"
+              message="Imagem excluida com sucesso!"
+            />
+          )
+        });
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async function handleEditAnnouncement(body: ProductDTO){
@@ -225,7 +280,7 @@ export default function EditAnnouncement() {
 
             <HStack space="md" className="flex-wrap">
               {
-                images.length > 0 && images.map(({ name, uri }) => (
+                images.length > 0 && images.map(({ uri, id, name }) => (
                   <Box className="w-[100px] h-[100px] relative" key={name}>
                     <Image 
                       source={{ uri: uri }}
@@ -237,7 +292,7 @@ export default function EditAnnouncement() {
                     />
                     <TouchableOpacity 
                       className="absolute right-1 top-1 z-10 w-5 h-5 rounded-full justify-center items-center bg-white"
-                      onPress={() => handleRemoveImage(name)}
+                      onPress={() => handleRemoveImage(name, id)}
                     >
                       <XCircle size={24} color="#3E3A40" weight="fill"   />
                     </TouchableOpacity>
