@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { FlatList } from "react-native";
 
-import { useFocusEffect } from "@react-navigation/native";
-
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { AppRoutesProps } from "@routes/app.routes";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 import api from "@services/api";
 import { UserProduct } from "@dtos/UserProduct";
@@ -16,22 +14,22 @@ import { Text } from "@/components/ui/text";
 import CustomSelect from "@components/CustomSelect";
 import CardItem from "@components/CardItem";
 import Header from "@components/Header";
-
-import { Plus } from "lucide-react-native";
 import Loading from "@components/Loading";
 
-type Props = BottomTabScreenProps<AppRoutesProps, "Announcements">;
+import { Plus } from "lucide-react-native";
 
-export default function Announcements({ navigation }: Props) {
+export default function Announcements() {
   const [products, setProducts] = useState<UserProduct[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   function handleNavigationToCreateAnnouncement(){
     navigation.navigate("CreateAnnouncement");
   }
 
   function handleNavigationToDetailsAnnouncement(id: string){
-    navigation.navigate("DetailsAnnouncement", { id });
+    navigation.navigate("DetailsAnnouncement", { id })
   }
 
   async function getAllAnnouncements(){
