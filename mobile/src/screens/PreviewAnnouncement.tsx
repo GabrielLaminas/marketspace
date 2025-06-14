@@ -198,9 +198,6 @@ export default function PreviewAnnouncement() {
     }
   }
 
-  // console.log("Selected: ", imagesSelected);
-  // console.log("Via Edit: ", params.images)
-
   useFocusEffect(
     useCallback(() => {
       getSelectImage();
