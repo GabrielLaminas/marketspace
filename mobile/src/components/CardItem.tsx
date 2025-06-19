@@ -24,8 +24,8 @@ export default function CardItem({ data, index, onPress }: Props) {
   const { user } = useContext(AuthContext);
 
   return (
-    <TouchableOpacity onPress={onPress} style={{ flex: 1 }}>
-      <VStack className={`flex-1 ${index % 2 === 0 && "mr-[20px]"}`}>
+    <TouchableOpacity onPress={onPress} style={{ flexGrow: 1, flexBasis: 50, flexShrink: 0 }}>
+      <VStack>
         <Box className="relative overflow-hidden rounded-md">
           { data?.product_images && (
             <Image 

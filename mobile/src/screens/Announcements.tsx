@@ -92,7 +92,7 @@ export default function Announcements() {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 64 }}
             numColumns={2}
-            columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 24 }}
+            columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 24, gap: 20 }}
             data={filterProducts}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item, index }) => (
