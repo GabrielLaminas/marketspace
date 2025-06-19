@@ -8,8 +8,8 @@ import { ChevronDownIcon } from "@/components/ui/icon";
 export default function CustomSelect() {
   return (
     <Select>
-      <SelectTrigger variant="outline" size="md" className="items-center bg-[#EDECEE] border-base-400">
-        <SelectInput placeholder="Todos" className="text-base-100 text-base" />
+      <SelectTrigger variant="outline" size="md" className=" items-center bg-transparent border-base-500">
+        <SelectInput placeholder="Todos" className="py-1 text-base-100 text-base" />
         <SelectIcon className="mr-3" as={ChevronDownIcon} />
       </SelectTrigger>
 
