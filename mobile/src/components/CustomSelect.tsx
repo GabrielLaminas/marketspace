@@ -1,3 +1,4 @@
+import React from "react";
 import { 
   Select, SelectTrigger, SelectInput, SelectIcon, SelectPortal, SelectBackdrop, 
   SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectItem 
@@ -5,10 +6,22 @@ import {
 
 import { ChevronDownIcon } from "@/components/ui/icon";
 
-export default function CustomSelect() {
+type Props = {
+  selected: "active" | "inactive" | "all";
+  setSelected: React.Dispatch<React.SetStateAction<"active" | "inactive" | "all">>;
+}
+
+export default function CustomSelect({ selected,  setSelected }: Props) {
+
+  function handleSelectValue(value: string){
+    if (value === "active" || value === "inactive" || value === "all") {
+      setSelected(value);
+    }    
+  }
+
   return (
-    <Select>
-      <SelectTrigger variant="outline" size="md" className=" items-center bg-transparent border-base-500">
+    <Select selectedValue={selected === "all" ? "Todos" : selected} onValueChange={handleSelectValue}>
+      <SelectTrigger variant="outline" size="md" className="items-center bg-transparent border-base-500">
         <SelectInput placeholder="Todos" className="py-1 text-base-100 text-base" />
         <SelectIcon className="mr-3" as={ChevronDownIcon} />
       </SelectTrigger>
@@ -16,7 +29,7 @@ export default function CustomSelect() {
       <SelectPortal>
         <SelectBackdrop />
 
-        <SelectContent className="items-center bg-base-700 shadow-base-300">
+        <SelectContent className="px-4 pb-20 pt-4 items-center bg-base-700 shadow-base-300">
           <SelectDragIndicatorWrapper>
             <SelectDragIndicator />
           </SelectDragIndicatorWrapper>
