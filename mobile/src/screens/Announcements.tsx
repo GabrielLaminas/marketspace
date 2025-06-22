@@ -15,6 +15,7 @@ import CustomSelect from "@components/CustomSelect";
 import CardItem from "@components/CardItem";
 import Header from "@components/Header";
 import Loading from "@components/Loading";
+import EmptyList from "@components/EmptyList";
 
 import { Plus } from "lucide-react-native";
 
@@ -90,7 +91,11 @@ export default function Announcements() {
         ) : (
           <FlatList 
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 64 }}
+            contentContainerStyle={
+              filterProducts.length === 0 
+              ? { flex: 1 }
+              : { paddingBottom: 64 } 
+            }
             numColumns={2}
             columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 24, gap: 20 }}
             data={filterProducts}
@@ -102,6 +107,7 @@ export default function Announcements() {
                 onPress={() => handleNavigationToDetailsAnnouncement(item.id)}
               />
             )}
+            ListEmptyComponent={() => <EmptyList description="Você ainda não tem produtos cadastrados!" />}
           />
         )
       }      

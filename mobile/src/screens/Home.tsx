@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { FlatList } from "react-native";
 
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -11,6 +11,7 @@ import Sell from "@components/Sell";
 import ProductFilter from "@components/ProductFilter";
 import CardItem from "@components/CardItem";
 import Filter, { CustomBottomSheetModalRef } from "@components/Filter";
+import api from "@services/api";
 
 interface Data {
   id: number;
@@ -85,6 +86,19 @@ export default function Home({ navigation }: Props) {
   function handleNavigationToDetails(){
     navigation.navigate("Details");
   }
+
+  async function getAllProducts(){
+    try {
+      const { data, status } = await api.get("/products/");
+      console.log(data, status)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(() => {
+    getAllProducts();
+  }, []);
   
   return (
     <>
