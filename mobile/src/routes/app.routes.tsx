@@ -19,7 +19,9 @@ type AppRoutes = {
   Home: undefined;
   Announcements: undefined;
   Logout: undefined;
-  Details: undefined;
+  Details: {
+    id: string;
+  };
   DetailsAnnouncement: {
     id: string;
   };
