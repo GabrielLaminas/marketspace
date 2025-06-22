@@ -16,11 +16,10 @@ import { Badge, BadgeText } from "@/components/ui/badge";
 
 type Props = {
   data: UserProduct;
-  index: number;
   onPress: () => void;
 }
 
-export default function CardItem({ data, index, onPress }: Props) {
+export default function CardItem({ data, onPress }: Props) {
   const { user } = useContext(AuthContext);
 
   return (
@@ -45,15 +44,15 @@ export default function CardItem({ data, index, onPress }: Props) {
           
           <HStack className={`w-full absolute left-0 top-0 p-1 ${user.id !== data.user_id ? "justify-between" : "justify-end"}`}>
             {
-              user.id !== data.user_id && (
+              data.user?.avatar && (
                 <Image 
-                  source={{ uri: `${api.defaults.baseURL}/images/${user.avatar}` }}
+                  source={{ uri: `${api.defaults.baseURL}/images/${data.user.avatar}` }}
                   size="none"
                   width={24}
                   height={24}
                   alt={user.name}
                   resizeMode="center"
-                  className="rounded-full border-2 border-base-700 bg-slate-400"
+                  className="rounded-full border border-base-700 bg-slate-400"
                 />
               )
             }
@@ -64,10 +63,10 @@ export default function CardItem({ data, index, onPress }: Props) {
         </Box>
 
         <Box className="mt-1">
-          <Text className={`text-base ${ data.is_active && data.is_active ? "text-base-200" : "text-base-400"}`}>
+          <Text className={`text-base ${ data.is_active || data.is_active === undefined ? "base-200" : "text-base-400"}`}>
             {data.name}
           </Text>
-          <Heading className={`text-lg ${data.is_active && data.is_active ? "text-base-100 font-bold" : "text-base-400 font-normal"}`}>
+          <Heading className={`text-lg ${ data.is_active || data.is_active === undefined ? "text-base-100 font-bold" : "text-base-400 font-normal"}`}>
             R$ {data.price}
           </Heading>
         </Box>

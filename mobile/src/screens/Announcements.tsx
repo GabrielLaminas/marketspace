@@ -100,14 +100,13 @@ export default function Announcements() {
             columnWrapperStyle={{ justifyContent: 'space-between', marginBottom: 24, gap: 20 }}
             data={filterProducts}
             keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item, index }) => (
+            renderItem={({ item }) => (
               <CardItem 
                 data={item} 
-                index={index} 
                 onPress={() => handleNavigationToDetailsAnnouncement(item.id)}
               />
             )}
-            ListEmptyComponent={() => <EmptyList description="Você ainda não tem produtos cadastrados!" />}
+            ListEmptyComponent={() => <EmptyList description="Você ainda não tem produtos cadastrados!" isAction />}
           />
         )
       }      
