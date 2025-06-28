@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { AppRoutesProps } from "@routes/app.routes";
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -35,8 +35,6 @@ import * as FileSystem from "expo-file-system";
 import { ArrowLeft, Plus } from "lucide-react-native";
 import { XCircle } from "phosphor-react-native";
 
-type Props = BottomTabScreenProps<AppRoutesProps, "CreateAnnouncement">;
-
 const paymentOptions = ["pix", "card", "boleto", "cash", "deposit"] as const;
 type PaymentMethods = typeof paymentOptions[number];
 
@@ -55,9 +53,9 @@ const createSchema = yup.object({
 
 type CreateAnnouncementFormData = yup.InferType<typeof createSchema>;
 
-export default function CreateAnnouncement({ navigation }: Props) {
+export default function CreateAnnouncement() {
   const [avatar, setAvatar] = useState<ImagesPickerProps[]>([]);
-
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
   const { control, handleSubmit, formState: { errors } } = useForm<CreateAnnouncementFormData>({
     resolver: yupResolver(createSchema)
   });

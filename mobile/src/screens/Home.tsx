@@ -5,7 +5,7 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { useNavigation } from "@react-navigation/native";
 
 import api from "@services/api";
-import { ProductsDTO } from "@dtos/Product";
+import { PaymentMethods, ProductsDTO } from "@dtos/Product";
 
 import { Box } from "@/components/ui/box";
 
@@ -20,6 +20,13 @@ import Loading from "@components/Loading";
 export default function Home() {
   const [products, setProducts] = useState<ProductsDTO[]>([]);
   const [search, setSearch] = useState("");
+  const [condition, setCondition] = useState({
+    new: false,
+    used: false,
+  });
+  const [trade, setTrade] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethods[]>([]);
+  const [queryParams, setQueryParams] = useState("");
   const [loading, setLoading] = useState(false);
 
   const modalRef = useRef<CustomBottomSheetModalRef>(null);
@@ -49,7 +56,7 @@ export default function Home() {
   async function getAllProducts(){
     try {
       setLoading(true);
-      const { data } = await api.get<ProductsDTO[]>(`/products/?query=${search}`);
+      const { data } = await api.get<ProductsDTO[]>(`/products/?query=${search}${queryParams}`);
       // 'http://localhost:3333/products/?is_new=true&accept_trade=true&payment_methods=pix&payment_methods=card&query=Cadeira'
       setProducts(data);
     } catch (error) {
@@ -61,10 +68,8 @@ export default function Home() {
 
   useEffect(() => {
     getAllProducts();
-  }, [search]);
+  }, [search, queryParams]);
 
-  console.log(search)
-  
   return (
     <>
       <Box className="flex-1 px-6 pt-16 relative">
@@ -108,6 +113,10 @@ export default function Home() {
       <Filter 
         ref={modalRef} 
         hiddenModal={handleFilterHiddenModal} 
+        condition={condition} setCondition={setCondition}
+        trade={trade} setTrade={setTrade}
+        paymentMethods={paymentMethods} setPaymentMethods={setPaymentMethods}
+        setQueryParams={setQueryParams}
       /> 
     </>
   );

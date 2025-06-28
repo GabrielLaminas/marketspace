@@ -40,6 +40,8 @@ export default function ProductFilter({ search, setSearch, ...rest }: Props) {
             autoFocus={false}
             value={searchText}
             onChangeText={(text) => handleUpdateSearch(text)}
+            onSubmitEditing={() => handleSetSearch(searchText)}
+            returnKeyType="search"
           />
         </Input>
 

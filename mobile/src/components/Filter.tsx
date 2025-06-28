@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { 
@@ -8,16 +8,20 @@ import {
   BottomSheetModalProvider
 } from "@gorhom/bottom-sheet";
 
+import { PaymentMethods } from '@dtos/Product';
+
 import { HStack } from '@/components/ui/hstack';
 import { VStack } from '@/components/ui/vstack';
 import { Heading } from '@/components/ui/heading';
 import { Box } from '@/components/ui/box';
 import { Switch } from '@/components/ui/switch';
+import { CheckboxGroup } from '@/components/ui/checkbox';
 
 import CustomCheckbox from './CustomCheckbox';
 import CustomButton from './CustomButton';
 
 import { X, XCircle } from "phosphor-react-native";
+
 
 export type CustomBottomSheetModalRef = {
   present: () => void;
@@ -26,13 +30,31 @@ export type CustomBottomSheetModalRef = {
 
 type Props = {
   hiddenModal: () => void
+  condition: {
+    new: boolean,
+    used: boolean,
+  };
+  setCondition: React.Dispatch<React.SetStateAction<{
+    new: boolean;
+    used: boolean;
+  }>>;
+  trade: boolean;
+  setTrade: React.Dispatch<React.SetStateAction<boolean>>;
+  paymentMethods: PaymentMethods[]; 
+  setPaymentMethods: React.Dispatch<React.SetStateAction<PaymentMethods[]>>;
+  setQueryParams: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Filter = forwardRef<CustomBottomSheetModalRef, Props>(({ hiddenModal }, ref) => {
-  const [conditionState, setConditionState] = useState({
-    newS: false,
-    usedS: false,
-  });
+const Filter = forwardRef<CustomBottomSheetModalRef, Props>(({ 
+  hiddenModal, 
+  condition, 
+  setCondition,
+  trade, 
+  setTrade,
+  paymentMethods, 
+  setPaymentMethods,
+  setQueryParams
+}, ref) => {
 
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const snapPoints = useMemo(() => ['80%'], []);
@@ -42,7 +64,34 @@ const Filter = forwardRef<CustomBottomSheetModalRef, Props>(({ hiddenModal }, re
     dismiss: () => bottomSheetModalRef.current?.dismiss(),
   }));
 
-  function handleSetCondition() {}
+  function handleCondition(state: { new: boolean, used: boolean }) {
+    setCondition(() => ({ new: state.new, used: state.used }));
+  }
+  
+  function handleTrade() {
+    setTrade((prevTrade) => !prevTrade);
+  }
+
+  function handlePayment(values: PaymentMethods[]) {
+    setPaymentMethods(values);
+  }
+
+  function handleResetFilter(){
+    setCondition({ new: false, used: false });
+    setTrade(false);
+    setPaymentMethods([]);
+  }
+
+  function handleSetFilter(){
+    let url = "";
+    url += `&is_new=${condition.new}&accept_trade=${trade}`;
+    paymentMethods.forEach((payment) => {
+      url += `&payment_methods=${payment}`
+    });
+
+    setQueryParams(url);
+    hiddenModal();
+  }
 
   return (
     <BottomSheetModalProvider>
@@ -78,26 +127,32 @@ const Filter = forwardRef<CustomBottomSheetModalRef, Props>(({ hiddenModal }, re
 
                 <HStack space="md">
                   <TouchableOpacity 
-                    className={`py-[6px] pl-[16px] rounded-full ${conditionState.newS ? 'pr-[6px] bg-product-secundary' : 'pr-[16px] bg-base-500'}`}
-                    // onPress={}
+                    className={`py-[6px] pl-[16px] rounded-full ${condition.new ? 'pr-[6px] bg-product-secundary' : 'pr-[16px] bg-base-500'}`}
+                    onPress={() => handleCondition({ new: true, used: false })}
                   >
                     <HStack space="sm" className="items-center">
-                      <Heading className={`text-sm uppercase ${conditionState.newS ? 'text-white' : 'text-base-300'}`}>
+                      <Heading className={`text-sm uppercase ${condition.new ? 'text-white' : 'text-base-300'}`}>
                         Novo
                       </Heading>
-                      { conditionState.newS && <XCircle color="#FFF" size={18} weight='fill' /> }
+                      
+                      <TouchableOpacity onPress={() => handleCondition({ new: false, used: false })}>
+                        { condition.new && <XCircle color="#FFF" size={18} weight='fill' /> }
+                      </TouchableOpacity>
                     </HStack>
                   </TouchableOpacity>
 
                   <TouchableOpacity 
-                    className={`py-[6px] pl-[16px] rounded-full ${conditionState.usedS ? 'pr-[6px] bg-product-secundary' : 'pr-[16px] bg-base-500'}`} 
-                    // onPress={}
+                    className={`py-[6px] pl-[16px] rounded-full ${condition.used ? 'pr-[6px] bg-product-secundary' : 'pr-[16px] bg-base-500'}`} 
+                    onPress={() => handleCondition({ new: false, used: true })}
                   >
                     <HStack space="sm" className="items-center">
-                      <Heading className={`text-sm uppercase ${conditionState.newS ? 'text-white' : 'text-base-300'}`}>
+                      <Heading className={`text-sm uppercase ${condition.used ? 'text-white' : 'text-base-300'}`}>
                         Usado
                       </Heading>
-                      { conditionState.usedS && <XCircle color="#FFF" size={18} weight='fill' /> }
+                      
+                      <TouchableOpacity onPress={() => handleCondition({ new: false, used: false })}>
+                        { condition.used && <XCircle color="#FFF" size={18} weight='fill' /> }
+                      </TouchableOpacity>
                     </HStack>
                   </TouchableOpacity>
                 </HStack>
@@ -108,6 +163,8 @@ const Filter = forwardRef<CustomBottomSheetModalRef, Props>(({ hiddenModal }, re
 
                 <HStack className="justify-start">
                   <Switch 
+                    value={trade}
+                    onToggle={handleTrade}
                     size="lg"
                     trackColor={{ false: "#D9D8DA", true: "#647AC7" }}
                     thumbColor="#F7F7F8"
@@ -119,19 +176,21 @@ const Filter = forwardRef<CustomBottomSheetModalRef, Props>(({ hiddenModal }, re
               <Box>
                 <Heading className="mb-[12px] text-base text-base-200">Meios de pagamento aceitos</Heading>
 
-                <VStack space="md" className="mt-2">
-                  <CustomCheckbox value="Boleto" />
-                  <CustomCheckbox value="Pix" />
-                  <CustomCheckbox value="Dinheiro" />
-                  <CustomCheckbox value="Cartão de Crédito" />
-                  <CustomCheckbox value="Depósito Bancário" />
-                </VStack>
+                <CheckboxGroup value={paymentMethods} onChange={handlePayment}>
+                  <VStack space="md" className="mt-2">
+                    <CustomCheckbox label="Boleto" value="boleto" />
+                    <CustomCheckbox label="Pix" value="pix" />
+                    <CustomCheckbox label="Dinheiro" value="cash" />
+                    <CustomCheckbox label="Cartão de Crédito" value="card" />
+                    <CustomCheckbox label="Depósito Bancário" value="deposit" />
+                  </VStack>
+                </CheckboxGroup>
               </Box>
             </VStack>
 
             <HStack space="lg" className="w-full">
-              <CustomButton text="Resetar filtros" variant="NEUTRAL" style={{flex: 1 }}  />
-              <CustomButton text="Aplicar filtros" variant="SECUNDARY" style={{flex: 1 }}  />
+              <CustomButton text="Resetar filtros" variant="NEUTRAL" style={{flex: 1 }} onPress={handleResetFilter} />
+              <CustomButton text="Aplicar filtros" variant="SECUNDARY" style={{flex: 1 }} onPress={handleSetFilter}  />
             </HStack>
           </VStack>
         </BottomSheetView>
