@@ -80,6 +80,7 @@ const Filter = forwardRef<CustomBottomSheetModalRef, Props>(({
     setCondition({ new: false, used: false });
     setTrade(false);
     setPaymentMethods([]);
+    setQueryParams("");
   }
 
   function handleSetFilter(){
