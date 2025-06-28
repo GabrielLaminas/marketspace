@@ -31,7 +31,7 @@ interface ProductCreated {
   is_active: boolean;
   is_new: boolean;
   name: string;
-  price: 230;
+  price: number;
   updated_at: string;
   user_id: string;
 }
@@ -56,7 +56,23 @@ interface ProductData extends ProductCreated {
   };
 }
 
+interface ProductsDTO {
+  accept_trade: boolean; 
+  id: string; 
+  is_new: boolean; 
+  name: string; 
+  is_active: boolean;
+  user_id: string;
+  payment_methods: PaymentMethods[]; 
+  price: number; 
+  product_images: ProductImages[]; 
+  user: {
+    avatar: string;
+  } | undefined;
+}
+
 export {
+  ProductsDTO,
   ProductDTO,
   PaymentMethods,
   ProductCreated,

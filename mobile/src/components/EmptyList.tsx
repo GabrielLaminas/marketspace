@@ -5,7 +5,12 @@ import { Box } from "@/components/ui/box";
 import { Text } from "@/components/ui/text";
 import CustomButton from "./CustomButton";
 
-export default function EmptyList({ description }: { description: string }) {
+type Props = {
+  description: string;
+  isAction?: boolean;
+}
+
+export default function EmptyList({ description, isAction = false }: Props) {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   function handleCreateAnnouncement(){
@@ -18,12 +23,16 @@ export default function EmptyList({ description }: { description: string }) {
         {description}
       </Text>
       
-      <CustomButton 
-        text="Criar anúncio"
-        variant="PRIMARY"
-        style={{ marginTop: 20 }}
-        onPress={handleCreateAnnouncement}
-      />
+      {
+        isAction && (
+          <CustomButton 
+            text="Criar anúncio"
+            variant="SECUNDARY"
+            style={{ marginTop: 20 }}
+            onPress={handleCreateAnnouncement}
+          />
+        )
+      }
     </Box>
   );
 }
