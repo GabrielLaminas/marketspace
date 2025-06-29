@@ -25,7 +25,9 @@ type AppRoutes = {
   DetailsAnnouncement: {
     id: string;
   };
-  CreateAnnouncement: undefined;
+  CreateAnnouncement: {
+    isEditing: boolean;
+  };
   EditAnnouncement: ProductDTO & { 
     id: string; 
     images: ImagesPickerProps[] 

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { FlatList } from "react-native";
 
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
@@ -6,6 +6,8 @@ import { useNavigation } from "@react-navigation/native";
 
 import api from "@services/api";
 import { PaymentMethods, ProductsDTO } from "@dtos/Product";
+
+import { AuthContext } from "@context/AuthContext";
 
 import { Box } from "@/components/ui/box";
 
@@ -18,6 +20,8 @@ import EmptyList from "@components/EmptyList";
 import Loading from "@components/Loading";
 
 export default function Home() {
+  const { user } = useContext(AuthContext);
+
   const [products, setProducts] = useState<ProductsDTO[]>([]);
   const [search, setSearch] = useState("");
   const [condition, setCondition] = useState({
@@ -41,14 +45,6 @@ export default function Home() {
     modalRef.current?.dismiss();   
   }
 
-  function handleNavigationToCreateAnnouncement(){
-    navigation.navigate("CreateAnnouncement");
-  }
-
-  function handleNavigationToAnnouncement(){
-    navigation.navigate("Announcements");
-  }
-
   function handleNavigationToDetailsAnnouncement(id: string){
     navigation.navigate("Details", { id });
   }
@@ -57,7 +53,6 @@ export default function Home() {
     try {
       setLoading(true);
       const { data } = await api.get<ProductsDTO[]>(`/products/?query=${search}${queryParams}`);
-      // 'http://localhost:3333/products/?is_new=true&accept_trade=true&payment_methods=pix&payment_methods=card&query=Cadeira'
       setProducts(data);
     } catch (error) {
       console.log(error);
@@ -73,9 +68,11 @@ export default function Home() {
   return (
     <>
       <Box className="flex-1 px-6 pt-16 relative">
-        <HomeHeader onPress={handleNavigationToCreateAnnouncement} />
+        <HomeHeader />
 
-        <Sell quantity={4} onPress={handleNavigationToAnnouncement} />
+        <Sell 
+          quantity={user.size_active_ad ? user.size_active_ad : 0} 
+        />
 
         <ProductFilter 
           search={search}

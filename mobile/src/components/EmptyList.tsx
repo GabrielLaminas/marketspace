@@ -14,7 +14,7 @@ export default function EmptyList({ description, isAction = false }: Props) {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   function handleCreateAnnouncement(){
-    navigation.navigate("CreateAnnouncement");
+    navigation.navigate("CreateAnnouncement", { isEditing: false });
   }
 
   return (

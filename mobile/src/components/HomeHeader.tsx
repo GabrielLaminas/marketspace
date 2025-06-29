@@ -3,6 +3,9 @@ import { useContext } from "react";
 import api from "@services/api";
 import { AuthContext } from "@context/AuthContext";
 
+import { useNavigation } from "@react-navigation/native";
+import { AppNavigatorRoutesProps } from "@routes/app.routes";
+
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
@@ -12,13 +15,14 @@ import CustomButton from "./CustomButton";
 import { Plus } from "lucide-react-native";
 import Avatar from "@assets/avatar.png";
 
-type Props = {
-  onPress: () => void;
-}
-
-export default function HomeHeader({ onPress }: Props) {
+export default function HomeHeader() {
+  const navigation = useNavigation<AppNavigatorRoutesProps>();
   const { user } = useContext(AuthContext);
-  const image = `${api.defaults.baseURL}/images/${user.avatar}`
+  const image = `${api.defaults.baseURL}/images/${user.avatar}`;
+
+  function handleNavigationToCreateAnnouncement(){
+    navigation.navigate("CreateAnnouncement", { isEditing: false });
+  }
 
   return (
     <HStack space="sm" className="w-full mb-9 items-center justify-between">
@@ -41,7 +45,7 @@ export default function HomeHeader({ onPress }: Props) {
         text="Criar anúncio"
         variant="SECUNDARY"
         icon={Plus}
-        onPress={onPress}
+        onPress={handleNavigationToCreateAnnouncement}
       />
     </HStack>
   );

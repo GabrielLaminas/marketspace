@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { FlatList } from "react-native";
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -6,6 +6,8 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 import api from "@services/api";
 import { UserProduct } from "@dtos/UserProduct";
+
+import { AuthContext } from "@context/AuthContext";
 
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
@@ -20,6 +22,8 @@ import EmptyList from "@components/EmptyList";
 import { Plus } from "lucide-react-native";
 
 export default function Announcements() {
+  const { setUser } = useContext(AuthContext);
+  
   const [products, setProducts] = useState<UserProduct[]>([]);
   const [filterProducts, setFilterProducts] = useState<UserProduct[]>([]);
   const [loading, setLoading] = useState(false);
@@ -28,7 +32,7 @@ export default function Announcements() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
 
   function handleNavigationToCreateAnnouncement(){
-    navigation.navigate("CreateAnnouncement");
+    navigation.navigate("CreateAnnouncement", { isEditing: false });
   }
 
   function handleNavigationToDetailsAnnouncement(id: string){
@@ -42,6 +46,9 @@ export default function Announcements() {
       setProducts(data);
       setFilterProducts(data);
       setSelected("all");
+
+      const activeProductsSize = data.filter((product) => product.is_active).length;
+      setUser((prevUser) => ({ ...prevUser, size_active_ad: activeProductsSize }));
     } catch (error) {
       console.log(error);
     } finally {

@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
 import { useForm, Controller } from "react-hook-form";
@@ -55,9 +55,21 @@ type CreateAnnouncementFormData = yup.InferType<typeof createSchema>;
 
 export default function CreateAnnouncement() {
   const [avatar, setAvatar] = useState<ImagesPickerProps[]>([]);
+
   const navigation = useNavigation<AppNavigatorRoutesProps>();
-  const { control, handleSubmit, formState: { errors } } = useForm<CreateAnnouncementFormData>({
-    resolver: yupResolver(createSchema)
+  const route = useRoute();
+  const params = route.params as { isEditing: boolean };
+
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<CreateAnnouncementFormData>({
+    resolver: yupResolver(createSchema),
+    defaultValues: {
+      accept_trade: false,
+      description: "",
+      is_new: "",
+      name: "",
+      payment_methods: [],
+      price: ""
+    }
   });
 
   const toast = useToast();
@@ -172,6 +184,22 @@ export default function CreateAnnouncement() {
     const avatars = avatar.filter(({ name }) => name !== id);
     setAvatar(avatars);
   }
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!params.isEditing) {
+        setAvatar([]);
+        reset({
+          accept_trade: false,
+          description: "",
+          is_new: "",
+          name: "",
+          payment_methods: [],
+          price: ""
+        });
+      }
+    }, [params.isEditing, reset])
+  );
 
   return (
     <VStack className="flex-1">
