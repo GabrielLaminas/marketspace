@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useImperativeHandle, useMemo, useRef } from 'react';
 import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { 
@@ -85,10 +85,18 @@ const Filter = forwardRef<CustomBottomSheetModalRef, Props>(({
 
   function handleSetFilter(){
     let url = "";
-    url += `&is_new=${condition.new}&accept_trade=${trade}`;
-    paymentMethods.forEach((payment) => {
-      url += `&payment_methods=${payment}`
-    });
+
+    if(condition.new || condition.used){
+      url += `&is_new=${condition.new}`;
+    }   
+
+    url += `&accept_trade=${trade}`;
+
+    if(paymentMethods.length > 0){
+      paymentMethods.forEach((payment) => {
+        url += `&payment_methods=${payment}`
+      });
+    }
 
     setQueryParams(url);
     hiddenModal();
