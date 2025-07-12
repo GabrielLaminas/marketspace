@@ -64,16 +64,24 @@ export default function Details() {
     }
   }
 
-  const handleSendWhatsappMessage = useCallback(async () => {
-    const url = `https://wa.me/${product.user?.tel}`;
-    const suportLink = await Linking.canOpenURL(url);
+  async function handleSendWhatsappMessage(){
+    try {
+      if(!product.user) return;
 
-    if(suportLink){
-      await Linking.openURL(url);
-    } else {
-      Alert.alert("Anúncio", "Não é possível abrir o link!");
+      const url = `https://wa.me/${product.user.tel}`;
+      const suportLink = await Linking.canOpenURL(url);
+
+      if(suportLink){
+        await Linking.openURL(url);
+      } else {
+        throw new Error("Não é possível abrir o link! Verifique seu número de telefone")
+      }
+    } catch (error) {
+      if(error instanceof Error){
+        Alert.alert("Anúncio", "Não é possível abrir o link!");
+      }      
     }
-  }, []);
+  }
 
   useFocusEffect(
     useCallback(() => {
