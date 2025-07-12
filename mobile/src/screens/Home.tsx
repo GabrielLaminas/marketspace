@@ -1,13 +1,12 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList } from "react-native";
 
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 import api from "@services/api";
 import { PaymentMethods, ProductsDTO } from "@dtos/Product";
-
-import { AuthContext } from "@context/AuthContext";
+import { UserProduct } from "@dtos/UserProduct";
 
 import { Box } from "@/components/ui/box";
 
@@ -20,8 +19,6 @@ import EmptyList from "@components/EmptyList";
 import Loading from "@components/Loading";
 
 export default function Home() {
-  const { user } = useContext(AuthContext);
-
   const [products, setProducts] = useState<ProductsDTO[]>([]);
   const [search, setSearch] = useState("");
   const [condition, setCondition] = useState({
@@ -31,6 +28,7 @@ export default function Home() {
   const [trade, setTrade] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethods[]>([]);
   const [queryParams, setQueryParams] = useState("");
+  const [activeAd, setActiveAd] = useState(0);
   const [loading, setLoading] = useState(false);
 
   const modalRef = useRef<CustomBottomSheetModalRef>(null);
@@ -61,6 +59,22 @@ export default function Home() {
     }
   }
 
+  async function getSizeActiveAdUser() {
+    try {
+      const { data } = await api.get<UserProduct[]>("/users/products");
+      const activeProductsSize = data.filter((product) => product.is_active).length;
+      setActiveAd(activeProductsSize);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      getSizeActiveAdUser();
+    }, [])
+  )
+
   useEffect(() => {
     getAllProducts();
   }, [search, queryParams]);
@@ -70,9 +84,7 @@ export default function Home() {
       <Box className="flex-1 px-6 pt-16 relative">
         <HomeHeader />
 
-        <Sell 
-          quantity={user.size_active_ad ? user.size_active_ad : 0} 
-        />
+        <Sell quantity={activeAd} />
 
         <ProductFilter 
           search={search}

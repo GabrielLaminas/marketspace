@@ -33,7 +33,7 @@ type PreviewRouteProps = ProductDTO & {
 }
 
 export default function PreviewAnnouncement() {
-  const { user, setUser } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [imagesSelected, setImagesSelected] = useState<ImagesPickerProps[]>([]);
 
   const route = useRoute();
@@ -76,7 +76,6 @@ export default function PreviewAnnouncement() {
         });
 
         if(status === 200 || status === 201){
-          setUser((prevData) => ({...prevData, size_active_ad: prevData.size_active_ad ? prevData.size_active_ad + 1 : 1}));
           navigation.navigate("DetailsAnnouncement", { id: data[0].product_id });
           toast.show({
             id: "success-preview-announcement",

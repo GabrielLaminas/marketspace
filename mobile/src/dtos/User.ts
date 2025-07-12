@@ -6,7 +6,6 @@ interface UserDTO {
   name: string; 
   tel: string; 
   updated_at: string;
-  size_active_ad?: number;
 }
 
 interface UserSignInDTO {
