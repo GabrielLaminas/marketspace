@@ -31,7 +31,7 @@ function AuthContextProvider({ children }: AuthContextProviderProps){
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserDTO>({} as UserDTO);
 
-  //funcção para salvar tanto o user quanto o token.
+  //função para salvar tanto o user quanto o token.
   function userAndTokenUpdate(userData: UserDTO, token: string){
     //anexar a informação do token no cabeçalho
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -46,9 +46,9 @@ function AuthContextProvider({ children }: AuthContextProviderProps){
         }
       });
 
-      if(data.token && data.user.id){
+      if(data.token && data.refresh_token && data.user.id){
         setLoading(true);
-        await saveAuthToken(data.token);
+        await saveAuthToken(data.token, data.refresh_token);
         await saveUserStorage(data.user);        
 
         userAndTokenUpdate(data.user, data.token);       
@@ -99,11 +99,11 @@ function AuthContextProvider({ children }: AuthContextProviderProps){
   async function getDataUserStorage(){
     try {
       setLoading(true);
-      const tokenUser = await getAuthToken();
+      const { token } = await getAuthToken();
       const userLogged = await getUserStorage();      
 
-      if(tokenUser && userLogged){
-        userAndTokenUpdate(userLogged, tokenUser);
+      if(token && userLogged){
+        userAndTokenUpdate(userLogged, token);
       }
     } catch (error) {
       throw error;
@@ -115,6 +115,15 @@ function AuthContextProvider({ children }: AuthContextProviderProps){
   useEffect(() => {
     getDataUserStorage();
   }, []);
+
+  useEffect(() => {
+    const subscribe = api.registerInterceptTokenManager(signOut);
+
+    //retorno é uma função de limpeza da memória
+    return () => {
+      subscribe();
+    }
+  }, [signOut]);
 
   return (
     <AuthContext.Provider value={{
