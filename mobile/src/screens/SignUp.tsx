@@ -6,6 +6,7 @@ import { AuthRoutesProps } from "@routes/auth.routes";
 
 import { AuthContext } from "@context/AuthContext";
 
+import MaskInput from "react-native-mask-input";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -54,11 +55,11 @@ export default function SignUp({ navigation }: Props) {
   const { control, handleSubmit, formState: { errors, defaultValues } } = useForm<FieldSignUpProps>({
     resolver: yupResolver(schemaSignUp),
     defaultValues: {
-      name: "Rocketseat",
-      email: "desafio2@rocketseat.com.br",
-      tel: "+5511915839644",
-      password: "123456",
-      confirm_password: "123456"
+      name: "",
+      email: "",
+      tel: "",
+      password: "",
+      confirm_password: ""
     }
   });
 
@@ -235,17 +236,23 @@ export default function SignUp({ navigation }: Props) {
                 />
               )}
             />
-
+            
             <Controller 
               name="tel"
               control={control}
               render={({ field: { value, onChange } }) => (
-                <CustomInput 
-                  placeholder="Telefone" type="text"
-                  value={value}
-                  onChangeText={onChange}
-                  error={errors.tel && errors.tel.message}
-                />
+                <Box>
+                  <MaskInput 
+                    value={value}
+                    onChangeText={(masked, unmasked) => onChange(masked)}
+                    mask={['+', '5', '5', /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/, /\d/]}
+                    keyboardType="phone-pad"
+                    placeholder="Telefone"
+                    placeholderTextColor="#9F9BA1"
+                    className="h-[45px] px-4 py-3 bg-base-700 border border-base-700 rounded-md"
+                  />
+                  { errors.tel && <Text className="mt-1 px-1 text-red-600 text-sm">{errors.tel.message}</Text> }
+                </Box>
               )}
             />
 
