@@ -7,6 +7,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import api from "@services/api";
 import { ImagesPickerProps, ProductDTO } from "@dtos/Product";
 
+import MaskInput, { createNumberMask } from "react-native-mask-input";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -50,6 +51,14 @@ const editSchema = yup.object({
     .of(yup.mixed<PaymentMethods>().oneOf(paymentOptions).required())
     .min(1, "É preciso marcar pelo menos um método de pagamento!")
     .required("Campo obrigatório"),
+});
+
+// Cria a máscara de moeda
+const currencyMask = createNumberMask({
+  prefix: ['R', '$', ' '],
+  delimiter: '.',
+  separator: ',',
+  precision: 2,
 });
 
 type EditAnnouncementFormData = yup.InferType<typeof editSchema>;

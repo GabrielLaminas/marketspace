@@ -43,7 +43,20 @@ export default function PreviewAnnouncement() {
   const toast = useToast();  
 
   function handleNavigationGoBack(){
-    navigation.navigate("CreateAnnouncement", { isEditing: true });
+    if(params.id){
+      navigation.navigate("EditAnnouncement", { 
+        accept_trade: params.accept_trade, 
+        description: params.description, 
+        id: params.id, 
+        is_new: params.is_new, 
+        name: params.name,
+        price: params.price,
+        payment_methods: params.payment_methods,
+        images: params.images 
+      });
+    } else {
+      navigation.navigate("CreateAnnouncement", { isEditing: true });
+    }    
   }
 
   async function handleCreateAnnouncement(){
@@ -127,10 +140,10 @@ export default function PreviewAnnouncement() {
       if(status === 204 && params.id){
         const imagesNames = new Set(imagesSelected.map(item => item.name));
         const newImages = params.images.filter(({ name }) => !imagesNames.has(name))
-        
         const imageFormData = new FormData();
 
-        imageFormData.append("product_id", params.id);
+        imageFormData.append("product_id", params.id); 
+
         newImages.forEach((image: ImagesPickerProps) => {
           imageFormData.append("images", {
             uri: image.uri,
@@ -235,10 +248,10 @@ export default function PreviewAnnouncement() {
               <BadgeText className="uppercase font-heading text-center text-base-200">{ params.is_new === "true" ? "Novo" : "Usado" }</BadgeText>
             </Badge>
 
-            <HStack className="w-full justify-between items-center">
-              <Heading className="text-base-100 text-2xl">{params.name}</Heading>
+            <HStack className="w-full justify-between gap-2">
+              <Heading className="text-base-100 text-2xl flex-1">{params.name}</Heading>
 
-              <HStack className="items-center">
+              <HStack className="items-center flex-shrink-0">
                 <Text className="text-product-secundary text-base mr-1">R$</Text>
                 <Heading className="text-product-secundary text-2xl">{params.price}</Heading>
               </HStack>

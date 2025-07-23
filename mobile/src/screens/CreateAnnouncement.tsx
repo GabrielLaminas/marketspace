@@ -4,6 +4,7 @@ import { ScrollView, TouchableOpacity } from "react-native";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 
+import MaskInput, { createNumberMask } from "react-native-mask-input";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -49,6 +50,14 @@ const createSchema = yup.object({
     .of(yup.mixed<PaymentMethods>().oneOf(paymentOptions).required())
     .min(1, "É preciso marcar pelo menos um método de pagamento!")
     .required("Campo obrigatório"),
+});
+
+// Cria a máscara de moeda
+const currencyMask = createNumberMask({
+  prefix: ['R', '$', ' '],
+  delimiter: '.',
+  separator: ',',
+  precision: 2,
 });
 
 type CreateAnnouncementFormData = yup.InferType<typeof createSchema>;
@@ -320,15 +329,21 @@ export default function CreateAnnouncement() {
               control={control}
               name="price"
               render={({ field: { value, onChange } }) => (
-                <CustomInput 
-                  type="text" 
-                  keyboardType="numeric"
-                  placeholder="Valor do produto" 
-                  value={value}
-                  onChangeText={onChange} 
-                  isMoney 
-                  error={ errors.price && errors.price.message }
-                />
+                <Box>
+                  <MaskInput 
+                    value={value}
+                    onChangeText={(masked, unmasked) => {
+                      const cents = parseFloat(unmasked) / 100;
+                      onChange(cents.toFixed(2));
+                    }}
+                    keyboardType="numeric"
+                    mask={currencyMask}
+                    placeholder="Valor do produto"
+                    placeholderTextColor="#9F9BA1"
+                    className="h-[45px] px-4 py-3 bg-base-700 border border-base-700 rounded-md"
+                  />
+                  { errors.price && <Text className="mt-1 px-1 text-red-600 text-sm">{errors.price.message}</Text> }
+                </Box>
               )}
             />            
 

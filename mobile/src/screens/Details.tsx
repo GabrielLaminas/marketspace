@@ -127,13 +127,13 @@ export default function Details() {
               <BadgeText className="uppercase font-heading text-center text-base-200">{product.is_new ? "Novo" : "Usado"}</BadgeText>
             </Badge>
 
-            <HStack className="w-full justify-between items-center">
-              <Heading className="text-base-100 text-2xl">{product.name}</Heading>
+            <HStack className="w-full justify-between gap-2">
+              <Heading className="text-base-100 text-2xl flex-1">{product.name}</Heading>
 
-              <Heading className="text-product-secundary text-2xl">
-                <Text className="text-product-secundary text-base mr-2">R$</Text>
-                {product.price}
-              </Heading>
+              <HStack className="items-center flex-shrink-0">
+                <Text className="text-product-secundary text-base mr-1">R$</Text>
+                <Heading className="text-product-secundary text-2xl">{product.price}</Heading>
+              </HStack>
             </HStack>
 
             <Text className="w-full text-base text-base-200">{product.description}</Text>
