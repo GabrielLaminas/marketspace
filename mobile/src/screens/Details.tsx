@@ -127,12 +127,14 @@ export default function Details() {
               <BadgeText className="uppercase font-heading text-center text-base-200">{product.is_new ? "Novo" : "Usado"}</BadgeText>
             </Badge>
 
-            <HStack className="w-full justify-between gap-2">
+            <HStack className="w-full justify-between items-start gap-2">
               <Heading className="text-base-100 text-2xl flex-1">{product.name}</Heading>
 
-              <HStack className="items-center flex-shrink-0">
-                <Text className="text-product-secundary text-base mr-1">R$</Text>
-                <Heading className="text-product-secundary text-2xl">{product.price}</Heading>
+              <HStack className="flex-shrink-0" space="xs">
+                <Text className="text-product-primary text-lg self-center">R$</Text>
+                <Heading className="text-product-secundary text-2xl">
+                  { new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 }).format(product.price).replace("R$", "").trim() }
+                </Heading>
               </HStack>
             </HStack>
 
@@ -160,10 +162,12 @@ export default function Details() {
 
       <Box className="px-[24px] pt-[20px] pb-[28px] bg-white">
         <HStack space="md" className="justify-between items-center">
-          <Heading className="text-product-primary text-3xl">
-            <Text className="text-product-primary text-lg mr-2">R$</Text>
-            {product.price}
-          </Heading>
+          <HStack className="flex-shrink-0 items-end" space="xs">
+            <Text className="text-product-primary text-lg mb-0.5">R$</Text>
+            <Heading className="text-product-primary text-3xl">
+              { new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 }).format(product.price).replace("R$", "").trim() }
+            </Heading>
+          </HStack>         
 
           <CustomButton
             text="Entrar em contato"

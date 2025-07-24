@@ -254,7 +254,9 @@ export default function DetailsAnnouncement() {
 
               <HStack className="items-center flex-shrink-0">
                 <Text className="text-product-secundary text-base mr-1">R$</Text>
-                <Heading className="text-product-secundary text-2xl">{product.price}</Heading>
+                <Heading className="text-product-secundary text-2xl">
+                  { new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 }).format(product.price).replace("R$", "").trim() }
+                </Heading>
               </HStack>
             </HStack>
 
