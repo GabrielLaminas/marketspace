@@ -27,14 +27,19 @@ import CustomToast from "@components/CustomToast";
 
 import { ArrowLeft, Tag } from "lucide-react-native";
 
+
+type ImageProps = ImagesPickerProps & {
+  id?: string;
+}
+
 type PreviewRouteProps = ProductDTO & { 
   id?: string;  
-  images: ImagesPickerProps[]
+  images: ImageProps[];
+  imagesDelete?: string[];
 }
 
 export default function PreviewAnnouncement() {
   const { user } = useContext(AuthContext);
-  const [imagesSelected, setImagesSelected] = useState<ImagesPickerProps[]>([]);
 
   const route = useRoute();
   const params = route.params as PreviewRouteProps;
@@ -128,53 +133,63 @@ export default function PreviewAnnouncement() {
 
   async function handleEditAnnouncement(){
     try {
-      const { status } = await api.put(`/products/${params.id}`, {
-        name: params.name,
-        description: params.description,
-        is_new: params.is_new === "true" ? true : false,
-        price: Number(params.price),
-        accept_trade: params.accept_trade,
-        payment_methods: params.payment_methods
-      });
-
-      if(status === 204 && params.id){
-        const imagesNames = new Set(imagesSelected.map(item => item.name));
-        const newImages = params.images.filter(({ name }) => !imagesNames.has(name))
-        const imageFormData = new FormData();
-
-        imageFormData.append("product_id", params.id); 
-
-        newImages.forEach((image: ImagesPickerProps) => {
-          imageFormData.append("images", {
-            uri: image.uri,
-            name: image.name,
-            type: image.type,
-          } as any);
-        });
-        
-        const { status } = await api.post<ImagesCreated[]>("/products/images/", imageFormData, { 
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
+      if(params.id && params.description && params.is_new && params.name && params.price && params.payment_methods.length > 0 && params.images.length > 0){
+        await api.put(`/products/${params.id}`, {
+          name: params.name,
+          description: params.description,
+          is_new: params.is_new === "true" ? true : false,
+          price: Number(params.price),
+          accept_trade: params.accept_trade,
+          payment_methods: params.payment_methods
         });
 
-        if(status === 200 || status === 201){
-          navigation.navigate("DetailsAnnouncement", { id: params.id });
-          toast.show({
-            id: "success-preview-announcement",
-            placement: "top",
-            duration: 5000,
-            containerStyle: { marginTop: 48 },
-            render: ({ id }) => (
-              <CustomToast 
-                id={id}
-                title="Visualização do anúncio"
-                action="success"
-                message="Anúncio atualizado com sucesso!"
-              />
-            )
-          })     
-        }         
+        //delete when exist images in imagesDelete
+        if(params.imagesDelete && params.imagesDelete.length > 0){
+          await api.delete("/products/images/", {
+            data: {
+              productImagesIds: params.imagesDelete
+            }
+          });
+        }       
+
+        const imagesCreate = params.images.filter((image) => !image.id);
+
+        //create when exist images without id in imagesCreate
+        if(imagesCreate.length > 0){
+          const imageFormData = new FormData();
+          imageFormData.append("product_id", params.id); 
+          imagesCreate.forEach((image: ImagesPickerProps) => {
+            imageFormData.append("images", {
+              uri: image.uri,
+              name: image.name,
+              type: image.type,
+            } as any);
+          });
+          
+          await api.post<ImagesCreated[]>("/products/images/", imageFormData, { 
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            }
+          }); 
+        }
+
+        navigation.navigate("DetailsAnnouncement", { id: params.id });
+        toast.show({
+          id: "success-preview-announcement",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Visualização do anúncio"
+              action="success"
+              message="Anúncio atualizado com sucesso!"
+            />
+          )
+        });
+      } else {
+        throw new Error("Você deve passar os parametros corretamente.")
       }
     } catch (error) {
       if(error instanceof Error){  
@@ -195,27 +210,6 @@ export default function PreviewAnnouncement() {
       }
     }
   }
-
-  async function getSelectImage(){
-    const { data } = await api.get<ProductData>(`/products/${params.id}`);
-    const image: ImagesPickerProps[] = data.product_images.map((image) => {
-      return {
-        id: image.id,
-        name: image.path,
-        uri: `${api.defaults.baseURL}/images/${image.path}`,
-        type: `image/${image.path.split(".")[1]}`
-      }
-    });
-    if(data.id){
-      setImagesSelected(image);
-    }
-  }
-
-  useFocusEffect(
-    useCallback(() => {
-      getSelectImage();
-    }, [params])
-  );
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
