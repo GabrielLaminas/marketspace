@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native";
 
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -222,7 +222,12 @@ export default function EditAnnouncement() {
       price: params.price,
       payment_methods: params.payment_methods
     });
-    setImages(params.images);   
+    setImages(params.images);
+    if(params.imagesDelete && params.imagesDelete.length > 0){
+      setDeleteImages(params.imagesDelete);
+    } else {
+      setDeleteImages([]);
+    }
   }
 
   useEffect(() => {

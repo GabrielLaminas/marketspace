@@ -31,6 +31,7 @@ type AppRoutes = {
   EditAnnouncement: ProductDTO & { 
     id: string; 
     images: ImagesPickerProps[];
+    imagesDelete?: string[];
   };
   PreviewAnnouncement: ProductDTO & { 
     id?: string; 

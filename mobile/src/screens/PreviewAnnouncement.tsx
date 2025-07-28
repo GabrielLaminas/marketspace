@@ -57,7 +57,8 @@ export default function PreviewAnnouncement() {
         name: params.name,
         price: params.price,
         payment_methods: params.payment_methods,
-        images: params.images 
+        images: params.images,
+        imagesDelete: params.imagesDelete
       });
     } else {
       navigation.navigate("CreateAnnouncement", { isEditing: true });
@@ -134,15 +135,6 @@ export default function PreviewAnnouncement() {
   async function handleEditAnnouncement(){
     try {
       if(params.id && params.description && params.is_new && params.name && params.price && params.payment_methods.length > 0 && params.images.length > 0){
-        await api.put(`/products/${params.id}`, {
-          name: params.name,
-          description: params.description,
-          is_new: params.is_new === "true" ? true : false,
-          price: Number(params.price),
-          accept_trade: params.accept_trade,
-          payment_methods: params.payment_methods
-        });
-
         //delete when exist images in imagesDelete
         if(params.imagesDelete && params.imagesDelete.length > 0){
           await api.delete("/products/images/", {
@@ -172,6 +164,15 @@ export default function PreviewAnnouncement() {
             }
           }); 
         }
+
+        await api.put(`/products/${params.id}`, {
+          name: params.name,
+          description: params.description,
+          is_new: params.is_new === "true" ? true : false,
+          price: Number(params.price),
+          accept_trade: params.accept_trade,
+          payment_methods: params.payment_methods
+        });
 
         navigation.navigate("DetailsAnnouncement", { id: params.id });
         toast.show({
