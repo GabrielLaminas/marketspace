@@ -4,7 +4,6 @@ import { ScrollView, TouchableOpacity } from "react-native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import api from "@services/api";
 import { ImagesPickerProps, ProductDTO } from "@dtos/Product";
 
 import MaskInput, { createNumberMask } from "react-native-mask-input";
@@ -230,6 +229,15 @@ export default function EditAnnouncement() {
     }
   }
 
+  function formatCurrencyInput(value: any) {
+    if (!value) return '';
+
+    const floatValue = parseFloat(value);
+    if (isNaN(floatValue)) return '';
+
+    return `R$ ${floatValue.toFixed(2).replace('.', ',')}`;
+  }
+
   useEffect(() => {
     updateFields();
   }, [params]);
@@ -353,15 +361,25 @@ export default function EditAnnouncement() {
               control={control}
               name="price"
               render={({ field: { value, onChange } }) => (
-                <CustomInput 
-                  type="text" 
-                  keyboardType="numeric"
-                  placeholder="Valor do produto" 
-                  value={value}
-                  onChangeText={onChange} 
-                  isMoney 
-                  error={ errors.price && errors.price.message }
-                />
+                <Box>
+                  <MaskInput 
+                    value={formatCurrencyInput(value)}
+                    onChangeText={(masked, unmasked) => {
+                      if (unmasked) {
+                        const cents = parseFloat(unmasked) / 100;
+                        onChange(cents.toFixed(2));
+                      } else {
+                        onChange('');
+                      }
+                    }}
+                    keyboardType="numeric"
+                    mask={currencyMask}
+                    placeholder="Valor do produto"
+                    placeholderTextColor="#9F9BA1"
+                    className="h-[45px] px-4 py-3 bg-base-700 border border-base-700 rounded-md"
+                  />
+                  { errors.price && <Text className="mt-1 px-1 text-red-600 text-sm">{errors.price.message}</Text> }
+                </Box>
               )}
             /> 
 
