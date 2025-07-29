@@ -57,7 +57,7 @@ export default function SignIn({ navigation }: Props) {
       setLoading(true);
       await signIn(email, password);
     } catch (error) {
-       setLoading(false);
+      setLoading(false);
       if(error instanceof Error){
         toast.show({
           id: "error-sign-in",
@@ -67,7 +67,7 @@ export default function SignIn({ navigation }: Props) {
           render: ({ id }) => (
             <CustomToast 
               id={id}
-              title="Sign In"
+              title="Acessar a conta"
               action="error"
               message={error.message}
             />

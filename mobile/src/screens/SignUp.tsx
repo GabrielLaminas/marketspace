@@ -105,7 +105,7 @@ export default function SignUp({ navigation }: Props) {
           render: ({ id }) => (
             <CustomToast 
               id={id}
-              title="Sign Up"
+              title="Criar uma conta"
               action="error"
               message={error.message}
             />
@@ -157,7 +157,7 @@ export default function SignUp({ navigation }: Props) {
           render: ({ id }) => (
             <CustomToast 
               id={id}
-              title="Sign Up"
+              title="Criar uma conta"
               action="error"
               message={error.message}
             />

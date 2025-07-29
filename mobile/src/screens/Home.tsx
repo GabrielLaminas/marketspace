@@ -8,6 +8,7 @@ import api from "@services/api";
 import { PaymentMethods, ProductsDTO } from "@dtos/Product";
 import { UserProduct } from "@dtos/UserProduct";
 
+import { useToast } from "@/components/ui/toast";
 import { Box } from "@/components/ui/box";
 
 import HomeHeader from "@components/HomeHeader";
@@ -17,6 +18,7 @@ import CardItem from "@components/CardItem";
 import Filter, { CustomBottomSheetModalRef } from "@components/Filter";
 import EmptyList from "@components/EmptyList";
 import Loading from "@components/Loading";
+import CustomToast from "@components/CustomToast";
 
 export default function Home() {
   const [products, setProducts] = useState<ProductsDTO[]>([]);
@@ -34,6 +36,8 @@ export default function Home() {
   const modalRef = useRef<CustomBottomSheetModalRef>(null);
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const toast = useToast();
 
   function handleFilterShowModal(){
     modalRef.current?.present();
@@ -53,7 +57,22 @@ export default function Home() {
       const { data } = await api.get<ProductsDTO[]>(`/products/?query=${search}${queryParams}`);
       setProducts(data);
     } catch (error) {
-      console.log(error);
+      if(error instanceof Error){
+        toast.show({
+          id: "error-get-all-products",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Buscar produtos"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
     } finally {
       setLoading(false);
     }
@@ -65,7 +84,22 @@ export default function Home() {
       const activeProductsSize = data.filter((product) => product.is_active).length;
       setActiveAd(activeProductsSize);
     } catch (error) {
-      throw error;
+      if(error instanceof Error){
+        toast.show({
+          id: "error-get-size-active-ad-user",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Buscar produtos"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
     }
   }
 

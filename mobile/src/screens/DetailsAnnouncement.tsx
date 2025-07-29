@@ -86,7 +86,22 @@ export default function DetailsAnnouncement() {
       setImages(image);
       setProduct(data);
     } catch (error) {
-      console.log(error);
+      if(error instanceof Error){
+        toast.show({
+          id: "error-product-id",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Detalhes do meu anúncio"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
     } finally {
       setLoading(false);
     }
