@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native";
 
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
-import api from "@services/api";
 import { ImagesPickerProps, ProductDTO } from "@dtos/Product";
 
+import MaskInput, { createNumberMask } from "react-native-mask-input";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -52,19 +52,29 @@ const editSchema = yup.object({
     .required("Campo obrigatório"),
 });
 
-type EditAnnouncementFormData = yup.InferType<typeof editSchema>;
+// Cria a máscara de moeda
+const currencyMask = createNumberMask({
+  prefix: ['R', '$', ' '],
+  delimiter: '.',
+  separator: ',',
+  precision: 2,
+});
 
-type ImagesProps = ImagesPickerProps & {
-  id?: string;
-}
+type EditAnnouncementFormData = yup.InferType<typeof editSchema>;
 
 type EditRouteProps = ProductDTO & { 
   id: string; 
-  images: ImagesProps[];
+  images: ImagesPickerProps[];
+  imagesDelete?: string[]; 
 };
 
+type ImageProps = ImagesPickerProps & {
+  id?: string;
+}
+
 export default function EditAnnouncement() {
-  const [images, setImages] = useState<ImagesProps[]>([]);
+  const [images, setImages] = useState<ImageProps[]>([]);
+  const [deleteImages, setDeleteImages] = useState<string[]>([]);
 
   const route = useRoute();
   const params = route.params as EditRouteProps;
@@ -117,7 +127,7 @@ export default function EditAnnouncement() {
       const fileExtension = imageSelected.assets[0].uri.split('.').pop();
 
       //precisa enviar para o backend essas informações de imagem.
-      const photoFile: ImagesProps = {
+      const photoFile: ImagesPickerProps = {
         name: `${imageSelected.assets[0].fileName}`.toLowerCase(),
         uri: imageURI,
         type: `${imageSelected.assets[0].type}/${fileExtension}`
@@ -144,58 +154,13 @@ export default function EditAnnouncement() {
     }
   }
 
-  function handleRemoveImage(name: string, id?: string){
-    if(!id) return;
+  function handleRemoveImage(name: string){
+    const newImageProducts = images.filter((image) => image.name !== name);
+    const removeImageProducts = images.find((image) => (image.id && image.name === name))?.id;
+    setImages(newImageProducts);
 
-    Alert.alert(
-      "Remover imagem",
-      "Tem certeza que deseja remover a imagem?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel"
-        },
-        {
-          text: "Excluir",
-          style: "destructive",
-          onPress: async () => {
-            await removeImageProducts(name, id);
-          }
-        }
-      ]
-    );
-  }
-
-  async function removeImageProducts(name: string, id: string){
-    try {
-      const newImage = images.filter((image) => image.name !== name);
-      const imagesIds = images.filter((image) => image.id === id).map((image) => image.id);
-
-      const { status } = await api.delete("/products/images/", {
-        data: {
-          productImagesIds: imagesIds
-        }
-      });
-
-      if(status === 204){
-        setImages(newImage);
-        toast.show({
-          id: "success-remove-image",
-          placement: "top",
-          duration: 5000,
-          containerStyle: { marginTop: 48 },
-          render: ({ id }) => (
-            <CustomToast 
-              id={id}
-              title="Editar anúncio"
-              action="success"
-              message="Imagem excluida com sucesso!"
-            />
-          )
-        });
-      }
-    } catch (error) {
-      console.log(error)
+    if (removeImageProducts) {
+      setDeleteImages((prevDeleteImage) => [...prevDeleteImage, removeImageProducts]);
     }
   }
 
@@ -223,7 +188,8 @@ export default function EditAnnouncement() {
           price: data.price,
           accept_trade: data.accept_trade,
           payment_methods: data.payment_methods,
-          images: images
+          images: images,
+          imagesDelete: deleteImages
         });
       }
     } catch (error) {
@@ -256,6 +222,20 @@ export default function EditAnnouncement() {
       payment_methods: params.payment_methods
     });
     setImages(params.images);
+    if(params.imagesDelete && params.imagesDelete.length > 0){
+      setDeleteImages(params.imagesDelete);
+    } else {
+      setDeleteImages([]);
+    }
+  }
+
+  function formatCurrencyInput(value: any) {
+    if (!value) return '';
+
+    const floatValue = parseFloat(value);
+    if (isNaN(floatValue)) return '';
+
+    return `R$ ${floatValue.toFixed(2).replace('.', ',')}`;
   }
 
   useEffect(() => {
@@ -280,7 +260,7 @@ export default function EditAnnouncement() {
 
             <HStack space="md" className="flex-wrap">
               {
-                images.length > 0 && images.map(({ uri, id, name }) => (
+                images.length > 0 && images.map(({ uri, name }) => (
                   <Box className="w-[100px] h-[100px] relative" key={name}>
                     <Image 
                       source={{ uri: uri }}
@@ -292,7 +272,7 @@ export default function EditAnnouncement() {
                     />
                     <TouchableOpacity 
                       className="absolute right-1 top-1 z-10 w-5 h-5 rounded-full justify-center items-center bg-white"
-                      onPress={() => handleRemoveImage(name, id)}
+                      onPress={() => handleRemoveImage(name)}
                     >
                       <XCircle size={24} color="#3E3A40" weight="fill"   />
                     </TouchableOpacity>
@@ -301,8 +281,8 @@ export default function EditAnnouncement() {
               }             
 
               <TouchableOpacity 
-                className={`w-[100px] h-[100px] justify-center items-center bg-base-500 rounded-lg ${images.length === 3 ? 'opacity-30' : 'opacity-100'}`} 
-                disabled={images.length === 3} onPress={handlePickImage}
+                className={`w-[100px] h-[100px] justify-center items-center bg-base-500 rounded-lg ${images.length >= 3 ? 'opacity-30' : 'opacity-100'}`} 
+                disabled={images.length >= 3} onPress={handlePickImage}
               >
                 <Plus size={24} color="#9F9BA1" />
               </TouchableOpacity>
@@ -381,15 +361,25 @@ export default function EditAnnouncement() {
               control={control}
               name="price"
               render={({ field: { value, onChange } }) => (
-                <CustomInput 
-                  type="text" 
-                  keyboardType="numeric"
-                  placeholder="Valor do produto" 
-                  value={value}
-                  onChangeText={onChange} 
-                  isMoney 
-                  error={ errors.price && errors.price.message }
-                />
+                <Box>
+                  <MaskInput 
+                    value={formatCurrencyInput(value)}
+                    onChangeText={(masked, unmasked) => {
+                      if (unmasked) {
+                        const cents = parseFloat(unmasked) / 100;
+                        onChange(cents.toFixed(2));
+                      } else {
+                        onChange('');
+                      }
+                    }}
+                    keyboardType="numeric"
+                    mask={currencyMask}
+                    placeholder="Valor do produto"
+                    placeholderTextColor="#9F9BA1"
+                    className="h-[45px] px-4 py-3 bg-base-700 border border-base-700 rounded-md"
+                  />
+                  { errors.price && <Text className="mt-1 px-1 text-red-600 text-sm">{errors.price.message}</Text> }
+                </Box>
               )}
             /> 
 

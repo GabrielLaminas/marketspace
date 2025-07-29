@@ -27,14 +27,19 @@ import CustomToast from "@components/CustomToast";
 
 import { ArrowLeft, Tag } from "lucide-react-native";
 
+
+type ImageProps = ImagesPickerProps & {
+  id?: string;
+}
+
 type PreviewRouteProps = ProductDTO & { 
   id?: string;  
-  images: ImagesPickerProps[]
+  images: ImageProps[];
+  imagesDelete?: string[];
 }
 
 export default function PreviewAnnouncement() {
   const { user } = useContext(AuthContext);
-  const [imagesSelected, setImagesSelected] = useState<ImagesPickerProps[]>([]);
 
   const route = useRoute();
   const params = route.params as PreviewRouteProps;
@@ -43,7 +48,21 @@ export default function PreviewAnnouncement() {
   const toast = useToast();  
 
   function handleNavigationGoBack(){
-    navigation.navigate("CreateAnnouncement", { isEditing: true });
+    if(params.id){
+      navigation.navigate("EditAnnouncement", { 
+        accept_trade: params.accept_trade, 
+        description: params.description, 
+        id: params.id, 
+        is_new: params.is_new, 
+        name: params.name,
+        price: params.price,
+        payment_methods: params.payment_methods,
+        images: params.images,
+        imagesDelete: params.imagesDelete
+      });
+    } else {
+      navigation.navigate("CreateAnnouncement", { isEditing: true });
+    }    
   }
 
   async function handleCreateAnnouncement(){
@@ -115,53 +134,63 @@ export default function PreviewAnnouncement() {
 
   async function handleEditAnnouncement(){
     try {
-      const { status } = await api.put(`/products/${params.id}`, {
-        name: params.name,
-        description: params.description,
-        is_new: params.is_new === "true" ? true : false,
-        price: Number(params.price),
-        accept_trade: params.accept_trade,
-        payment_methods: params.payment_methods
-      });
+      if(params.id && params.description && params.is_new && params.name && params.price && params.payment_methods.length > 0 && params.images.length > 0){
+        //delete when exist images in imagesDelete
+        if(params.imagesDelete && params.imagesDelete.length > 0){
+          await api.delete("/products/images/", {
+            data: {
+              productImagesIds: params.imagesDelete
+            }
+          });
+        }       
 
-      if(status === 204 && params.id){
-        const imagesNames = new Set(imagesSelected.map(item => item.name));
-        const newImages = params.images.filter(({ name }) => !imagesNames.has(name))
-        
-        const imageFormData = new FormData();
+        const imagesCreate = params.images.filter((image) => !image.id);
 
-        imageFormData.append("product_id", params.id);
-        newImages.forEach((image: ImagesPickerProps) => {
-          imageFormData.append("images", {
-            uri: image.uri,
-            name: image.name,
-            type: image.type,
-          } as any);
+        //create when exist images without id in imagesCreate
+        if(imagesCreate.length > 0){
+          const imageFormData = new FormData();
+          imageFormData.append("product_id", params.id); 
+          imagesCreate.forEach((image: ImagesPickerProps) => {
+            imageFormData.append("images", {
+              uri: image.uri,
+              name: image.name,
+              type: image.type,
+            } as any);
+          });
+          
+          await api.post<ImagesCreated[]>("/products/images/", imageFormData, { 
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            }
+          }); 
+        }
+
+        await api.put(`/products/${params.id}`, {
+          name: params.name,
+          description: params.description,
+          is_new: params.is_new === "true" ? true : false,
+          price: Number(params.price),
+          accept_trade: params.accept_trade,
+          payment_methods: params.payment_methods
         });
-        
-        const { status } = await api.post<ImagesCreated[]>("/products/images/", imageFormData, { 
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          }
-        });
 
-        if(status === 200 || status === 201){
-          navigation.navigate("DetailsAnnouncement", { id: params.id });
-          toast.show({
-            id: "success-preview-announcement",
-            placement: "top",
-            duration: 5000,
-            containerStyle: { marginTop: 48 },
-            render: ({ id }) => (
-              <CustomToast 
-                id={id}
-                title="Visualização do anúncio"
-                action="success"
-                message="Anúncio atualizado com sucesso!"
-              />
-            )
-          })     
-        }         
+        navigation.navigate("DetailsAnnouncement", { id: params.id });
+        toast.show({
+          id: "success-preview-announcement",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Visualização do anúncio"
+              action="success"
+              message="Anúncio atualizado com sucesso!"
+            />
+          )
+        });
+      } else {
+        throw new Error("Você deve passar os parametros corretamente.")
       }
     } catch (error) {
       if(error instanceof Error){  
@@ -182,27 +211,6 @@ export default function PreviewAnnouncement() {
       }
     }
   }
-
-  async function getSelectImage(){
-    const { data } = await api.get<ProductData>(`/products/${params.id}`);
-    const image: ImagesPickerProps[] = data.product_images.map((image) => {
-      return {
-        id: image.id,
-        name: image.path,
-        uri: `${api.defaults.baseURL}/images/${image.path}`,
-        type: `image/${image.path.split(".")[1]}`
-      }
-    });
-    if(data.id){
-      setImagesSelected(image);
-    }
-  }
-
-  useFocusEffect(
-    useCallback(() => {
-      getSelectImage();
-    }, [params])
-  );
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -235,12 +243,14 @@ export default function PreviewAnnouncement() {
               <BadgeText className="uppercase font-heading text-center text-base-200">{ params.is_new === "true" ? "Novo" : "Usado" }</BadgeText>
             </Badge>
 
-            <HStack className="w-full justify-between items-center">
-              <Heading className="text-base-100 text-2xl">{params.name}</Heading>
+            <HStack className="w-full justify-between gap-2">
+              <Heading className="text-base-100 text-2xl flex-1">{params.name}</Heading>
 
-              <HStack className="items-center">
+              <HStack className="items-center flex-shrink-0">
                 <Text className="text-product-secundary text-base mr-1">R$</Text>
-                <Heading className="text-product-secundary text-2xl">{params.price}</Heading>
+                <Heading className="text-product-secundary text-2xl">
+                  { new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 }).format(Number(params.price)).replace("R$", "").trim() }
+                </Heading>
               </HStack>
             </HStack>
 

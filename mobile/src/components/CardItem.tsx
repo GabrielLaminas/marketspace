@@ -66,9 +66,12 @@ export default function CardItem({ data, onPress }: Props) {
           <Text className={`text-base ${ data.is_active || data.is_active === undefined ? "base-200" : "text-base-400"}`}>
             {data.name}
           </Text>
-          <Heading className={`text-lg ${ data.is_active || data.is_active === undefined ? "text-base-100 font-bold" : "text-base-400 font-normal"}`}>
-            R$ {data.price}
-          </Heading>
+          <HStack className="flex-shrink-0 items-center" space="xs">
+            <Text className={`text-sm mt-1 ${ data.is_active || data.is_active === undefined ? "text-base-100 font-bold" : "text-base-400 font-normal"}`}>R$</Text>
+            <Heading className={`text-lg ${ data.is_active || data.is_active === undefined ? "text-base-100 font-bold" : "text-base-400 font-normal"}`}>
+              { new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 2 }).format(data.price).replace("R$", "").trim() }
+            </Heading>
+          </HStack>  
         </Box>
       </VStack>
     </TouchableOpacity>    
