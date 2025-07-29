@@ -10,12 +10,14 @@ import { UserProduct } from "@dtos/UserProduct";
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
 import { Text } from "@/components/ui/text";
+import { useToast } from "@/components/ui/toast";
 
 import CustomSelect from "@components/CustomSelect";
 import CardItem from "@components/CardItem";
 import Header from "@components/Header";
 import Loading from "@components/Loading";
 import EmptyList from "@components/EmptyList";
+import CustomToast from "@components/CustomToast";
 
 import { Plus } from "lucide-react-native";
 
@@ -26,6 +28,8 @@ export default function Announcements() {
   const [selected, setSelected] = useState<"active" | "inactive" | "all">("all");
 
   const navigation = useNavigation<AppNavigatorRoutesProps>();
+
+  const toast = useToast();
 
   function handleNavigationToCreateAnnouncement(){
     navigation.navigate("CreateAnnouncement", { isEditing: false });
@@ -43,7 +47,22 @@ export default function Announcements() {
       setFilterProducts(data);
       setSelected("all");
     } catch (error) {
-      console.log(error);
+      if(error instanceof Error){
+        toast.show({
+          id: "error-get-user-products",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Meus anúncios"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
     } finally {
       setLoading(false);
     }

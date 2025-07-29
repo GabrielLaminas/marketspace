@@ -144,7 +144,7 @@ export default function EditAnnouncement() {
           render: ({ id }) => (
             <CustomToast 
               id={id}
-              title="Criar anúncio"
+              title="Editar anúncio"
               action="error"
               message={error.message}
             />

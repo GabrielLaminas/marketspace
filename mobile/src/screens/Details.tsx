@@ -16,11 +16,13 @@ import { HStack } from "@/components/ui/hstack";
 import { Badge, BadgeText } from "@/components/ui/badge";
 import { Heading } from "@/components/ui/heading";
 import { Image } from "@/components/ui/image";
+import { useToast } from "@/components/ui/toast";
 
 import CustomButton from "@components/CustomButton";
 import Carousel from "@components/Carousel";
 import Header from "@components/Header";
 import Loading from "@components/Loading";
+import CustomToast from "@components/CustomToast";
 
 import { ArrowLeft, Phone } from "lucide-react-native";
 
@@ -36,6 +38,8 @@ export default function Details() {
   const navigation = useNavigation<AppNavigatorRoutesProps>();
   const route = useRoute();
   const params = route.params as { id: string };
+
+  const toast = useToast();
 
   function handleNavigationToGoBack(){
     navigation.goBack();
@@ -58,7 +62,22 @@ export default function Details() {
       setImages(image);
       setProduct(data);
     } catch (error) {
-      console.log(error);
+      if(error instanceof Error){
+        toast.show({
+          id: "error-get-product-ad",
+          placement: "top",
+          duration: 5000,
+          containerStyle: { marginTop: 48 },
+          render: ({ id }) => (
+            <CustomToast 
+              id={id}
+              title="Detalhes do produto"
+              action="error"
+              message={error.message}
+            />
+          )
+        })
+      }
     } finally {
       setLoading(false);
     }
